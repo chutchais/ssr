@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Booking List
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+				<h3>Booking File List       <small><a href="{% url 'crm:create'%}">create</a></small></h3>
+
+					<form class='form' method='GET' action='.'>
+						<input type='text' id='search' placeholder="Search filename.." name="q" value='{{ request.GET.q}}'>
+						<button class='btn btn-default' type='submit'>Search</button>
+						<a href="{% url 'crm:list'  %}">Clear result</a>
+					</form>
+
+				<table class="table table-bordered">
+					<tr>
+						<th>File name</th>
+						<th>Company</th>
+				        <th>Remark</th>
+				        <th>#Booking</th>
+				        <th>datetime</th>
+				        <th>Upload</th>
+				        <th>Upload Date</th>
+				      </tr>
+
+					
+						{% for f in object_list %}
+						<tr>
+					 	<td><a href="{% url 'crm:detail' f.slug  %}">{{ f.name|filename }}</a></td>
+					 	<td>{{ f.company }}</td>
+					 	<td>{{ f.remark }}</td>
+					 	<td>{{ f.booking_set.count }}</td>
+					 	<td>{{ f.created_date }}</td>
+					 	<td>{{ f.uploaded }}</td>
+					 	<td>{{ f.upload_date }}</td>
+					 	{% empty %}
+					 		<td>No list</td>
+					 	</tr>
+					 	{% endfor %}
+					 
+
+				</table>
+
+				{% if is_paginated %}
+				  <ul class="pagination">
+				    {% if page_obj.has_previous %}
+				      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&laquo;</span></li>
+				    {% endif %}
+				    {% for i in paginator.page_range %}
+				      {% if page_obj.number == i %}
+				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+				      {% else %}
+				        <li><a href="?page={{ i }}">{{ i }}</a></li>
+				      {% endif %}
+				    {% endfor %}
+				    {% if page_obj.has_next %}
+				      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&raquo;</span></li>
+				    {% endif %}
+				  </ul>
+				{% endif %}
+
+	<hr/>
+
+	</div>
+</div>
+{% endblock content %}

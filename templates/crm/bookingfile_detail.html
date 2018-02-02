@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Booking List
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+				<h3>{{ object.name|filename }}</h3>
+					 	Remark :{{ object.remark }}<br>
+					 	Created on:{{ object.created_date }}<hr/>
+					 	<h3>Process File.</h3>
+					 	Process : {{ object.uploaded }} <br>
+					 	Process on :{{ object.upload_date }} <br>
+					 	<br>
+					 	{% if not object.uploaded %}
+					 		<a href="{% url 'crm:process' object.slug %}"><button type="button" class="btn btn-primary">Process</button></a>
+					 	{% endif %}
+
+
+
+	{% if object.booking_set %}
+		<a href="{% url 'crm:delete' object.slug %}"><button type="button" class="btn btn-danger">Delete Booking File</button></a>
+
+		{% if object.booking_set.count %}
+		<a href="{% url 'crm:vip' object.slug %}"><button type="button" class="btn btn-primary">Calulate VIP Charge</button></a>
+		{% endif %}
+
+		<hr/>
+		{% for object in object.booking_set.all %}
+			{% include "crm/booking_snippet.html" %}
+			<!-- <div class="row">
+					<div class="page-header">
+						<h3>Booking : {{ b.name}}</h3>
+					</div>
+						<div class="col-xs-6 col-sm-6">
+							<table class="table table-hover">
+								<tr class="success">
+									<th>Vessel</th>
+									<th>Voy</th>
+									<th>Line</th>
+									<th>Agent</th>
+								</tr>
+								<tr >
+									<td>{{b.vessel}}</td>
+									<td>{{b.voy}}</td>
+									<td>{{b.line}}</td>
+									<td>{{b.agent}}</td>
+								</tr>
+								<tr class="success">
+									<th>Bill to</th>
+									<th>Customer</th>
+								</tr>
+								<tr>
+									<td>{{b.billed_to}}</td>
+									<td>{{b.customer}}</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-xs-6 col-sm-6">
+							<table class="table table-hover">
+								<tr class="success">
+									<th>VIP Detail</th>
+									<th></th>
+								</tr>
+								{% if b.vip %}
+								<tr><td>No back charge : <b>{{ b.vip.no_back_charge }}</b></td>
+									<td>Storage fee : <b>{{ b.vip.storage }}</b></td>
+								</tr>
+								<tr><td>Lift-On : <b>{{ b.vip.lifton }}</b></td>
+									<td>Location: <b>{{ b.vip.reloc }}</b></td>
+								</tr>
+								{% endif %}
+							</table>
+						</div>
+						<div>
+							<table class="table table-bordered">
+								<tr>
+									<th>#</th>
+									<th>ISO</th>
+									<th>Length</th>
+									<th>In</th>
+									<th>Out</th>
+									<th>dWell</th>
+									<th>Charge#</th>
+								</tr>
+								{% for c in b.container_set.all %}
+									<tr>
+										<td>{{c.number}}</td>
+										<td>{{c.iso}}</td>
+										<td>{{c.container_size}}</td>
+										<td>{{c.in_date}}</td>
+										<td>{{c.out_date}}</td>
+										<td>{{c.dwell}}</td>
+										<td>{{c.charge}}</td>
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+
+				</div> -->
+			{% endfor %}
+	{% endif %}
+
+	</div>
+</div>
+{% endblock content %}

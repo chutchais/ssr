@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Booking List
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+		{% include "crm/booking_snippet.html" %}
+	</div>
+</div>
+{% endblock content %}

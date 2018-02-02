@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Booking List
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+				<h3>Booking List </h3>
+
+					<form class='form' method='GET' action='.'>
+						<input type='text' id='search' placeholder="Search booking,voy,line,vessel,customer" name="q" value='{{ request.GET.q}}'>
+						<button class='btn btn-default' type='submit'>Search</button>
+						<a href="{% url 'crm:booking-list'  %}">Clear result</a>
+					</form>
+
+				<table class="table table-bordered">
+					<tr>
+						<th>Name</th>
+				        <th>Voy</th>
+				        <th>Company</th>
+				        <th>Line</th>
+				        <!-- <th>Agent</th> -->
+				        <th>Vessel</th>
+				        <th>Customer</th>
+				        <th>#Container</th>
+				        <th>#Total dWell</th>
+				        <th>#Total charge</th>
+				        <th>Vip</th>
+				        <th>Datetime</th>
+				      </tr>
+
+					
+						{% for b in object_list %}
+						<tr>
+					 	<td><a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a></td>
+					 	<td>{{ b.voy }}</td>
+					 	<td>{{ b.company }}</td>
+					 	<td>{{ b.line }}</td>
+					 	<!-- <td>{{ b.agent }}</td> -->
+					 	<td><small>{{ b.vessel }}</small></td>
+					 	<td><small>{{ b.customer }}</small></td>
+					 	<td>{{ b.container_set.count }}</td>
+					 	<td>{{ b.dwell_total }}</td>
+					 	<td>{{ b.charge_total }}</td>
+					 	<td>
+					 		{% if b.vip %}
+					 			<span class="glyphicon glyphicon-ok text-success"></span>
+					 		{% else %}
+					 			<span class="glyphicon glyphicon-remove text-danger"></span>
+					 		{% endif %}
+
+					 	</td>
+					 	<td>{{ b.created_date }}</td>
+					 	{% empty %}
+					 		<td>No list</td>
+					 	</tr>
+					 	{% endfor %}
+					 
+
+				</table>
+				{% if is_paginated %}
+				  <ul class="pagination">
+				    {% if page_obj.has_previous %}
+				      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&laquo;</span></li>
+				    {% endif %}
+				    {% for i in paginator.page_range %}
+				      {% if page_obj.number == i %}
+				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+				      {% else %}
+				        <li><a href="?page={{ i }}">{{ i }}</a></li>
+				      {% endif %}
+				    {% endfor %}
+				    {% if page_obj.has_next %}
+				      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&raquo;</span></li>
+				    {% endif %}
+				  </ul>
+				{% endif %}
+
+	<hr/>
+
+	</div>
+</div>
+{% endblock content %}

@@ -1,0 +1,60 @@
+{% load staticfiles %}
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+
+
+
+
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="{% static 'bootstrap/js/jquery-1.12.2.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"></link>
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}"></link>
+    <!-- Latest compiled and minified CSS -->
+
+
+
+
+
+
+ <!-- navbar-inverse navbar-fixed-top -->
+
+   <nav class="navbar navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">CRM - SSR </a>
+        </div>
+
+      </div>
+    </nav>
+
+<!-- <div class="container-fluid"> -->
+      <div class="container" >
+          {% include "nav.html" %}
+          {% block head %}
+          {% endblock head %}
+          
+          {% block content %}
+          {% endblock content %}
+ 
+          {% block java_content %}
+          {% endblock java_content %}
+        </div>
+  </body>
+
+   
+  </html>

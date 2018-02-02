@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Berth Schedule Report
+{% endblock %}
+
+
+{% block form_content %}
+<div class="row">
+    <h3>
+    Berth Schedule Report
+    </h3>
+	<!-- Parameter Section -->
+      <table class="table table-bordered">
+      <tr>
+        <th>Report Name</th>
+        <th>PDF Files</th>
+        <th>Remark</th>
+        <th>Update On</th>
+      </tr>
+
+             {% for obj in objs %}
+               <tr>
+                  <td>
+                  {{ obj.week_name}}
+                  </td>
+                  <td>
+                  <a href="{{ obj.current_week.url}}"> Current Week</a><br>
+                  <a href="{{ obj.next_week.url}}"> Next Week </a>
+                  </td>
+                  <td>
+                  {{ obj.remark|linebreaks }}
+                  </td>
+                  <td>
+                  {{ obj.modified_date}}
+                  </td>
+                </tr>
+              {% endfor %}
+      </table>
+              <!-- End Parameter-->
+</div>
+{% endblock form_content %}
