@@ -9,12 +9,71 @@
 {% endblock %}
 
 
+{% block style %}
+<style>
+    @media print {
+     /* styles go here */
+         @page {                
+            size: A4;
+            margin: 15 mm;
+          }
+
+          html, body {
+            width: 1024px;
+          }
+
+          body {
+            margin: 0 auto;
+            line-height: 1em;
+            word-spacing:1px;
+            letter-spacing:0.2px;
+            font: 14px "Times New Roman", Times, serif;
+            background:white;
+            color:black;
+            width: 100%;
+            float: none;
+          }
+
+
+                  a[href]:after {
+            content: none !important;
+          }
+
+        .no-print, .no-print *
+            {
+                display: none !important;
+            }
+
+/*        {
+          table { page-break-after:auto }
+          tr    { page-break-inside:avoid; page-break-after:auto }
+          td    { page-break-inside:avoid; page-break-after:auto }
+          thead { display:table-header-group }
+          tfoot { display:table-footer-group }
+        }*/
+
+        /*table {page-break-after:always}*/
+
+        .page-break, .page-break *
+        {
+        	page-break-after:always
+        }
+
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
 	<div class="row">
+
+		<div class="no-print">
 				<h3>{{ object.name|filename }}</h3>
 					 	Remark :{{ object.remark }}<br>
-					 	Created on:{{ object.created_date }}<hr/>
+					 	Created on:{{ object.created_date }}
+					 	
+		
+			<hr/>
 					 	<h3>Process File.</h3>
 					 	Process : {{ object.uploaded }} <br>
 					 	Process on :{{ object.upload_date }} <br>
@@ -25,89 +84,32 @@
 
 
 
-	{% if object.booking_set %}
-		<a href="{% url 'crm:delete' object.slug %}"><button type="button" class="btn btn-danger">Delete Booking File</button></a>
+				{% if object.booking_set %}
+					<a href="{% url 'crm:delete' object.slug %}"><button type="button" class="btn btn-danger">Delete Booking File</button></a>
 
-		{% if object.booking_set.count %}
-		<a href="{% url 'crm:vip' object.slug %}"><button type="button" class="btn btn-primary">Calulate VIP Charge</button></a>
-		{% endif %}
-
+					{% if object.booking_set.count %}
+					<a href="{% url 'crm:vip' object.slug %}"><button type="button" class="btn btn-primary">Calulate VIP Charge</button></a>
+					{% endif %}
+		</div>
 		<hr/>
 		{% for object in object.booking_set.all %}
+			
 			{% include "crm/booking_snippet.html" %}
-			<!-- <div class="row">
-					<div class="page-header">
-						<h3>Booking : {{ b.name}}</h3>
-					</div>
-						<div class="col-xs-6 col-sm-6">
-							<table class="table table-hover">
-								<tr class="success">
-									<th>Vessel</th>
-									<th>Voy</th>
-									<th>Line</th>
-									<th>Agent</th>
-								</tr>
-								<tr >
-									<td>{{b.vessel}}</td>
-									<td>{{b.voy}}</td>
-									<td>{{b.line}}</td>
-									<td>{{b.agent}}</td>
-								</tr>
-								<tr class="success">
-									<th>Bill to</th>
-									<th>Customer</th>
-								</tr>
-								<tr>
-									<td>{{b.billed_to}}</td>
-									<td>{{b.customer}}</td>
-								</tr>
-							</table>
-						</div>
-						<div class="col-xs-6 col-sm-6">
-							<table class="table table-hover">
-								<tr class="success">
-									<th>VIP Detail</th>
-									<th></th>
-								</tr>
-								{% if b.vip %}
-								<tr><td>No back charge : <b>{{ b.vip.no_back_charge }}</b></td>
-									<td>Storage fee : <b>{{ b.vip.storage }}</b></td>
-								</tr>
-								<tr><td>Lift-On : <b>{{ b.vip.lifton }}</b></td>
-									<td>Location: <b>{{ b.vip.reloc }}</b></td>
-								</tr>
-								{% endif %}
-							</table>
-						</div>
-						<div>
-							<table class="table table-bordered">
-								<tr>
-									<th>#</th>
-									<th>ISO</th>
-									<th>Length</th>
-									<th>In</th>
-									<th>Out</th>
-									<th>dWell</th>
-									<th>Charge#</th>
-								</tr>
-								{% for c in b.container_set.all %}
-									<tr>
-										<td>{{c.number}}</td>
-										<td>{{c.iso}}</td>
-										<td>{{c.container_size}}</td>
-										<td>{{c.in_date}}</td>
-										<td>{{c.out_date}}</td>
-										<td>{{c.dwell}}</td>
-										<td>{{c.charge}}</td>
-								</tr>
-								{% endfor %}
-							</table>
-						</div>
-
-				</div> -->
-			{% endfor %}
+			<div class="page-break">
+			</div>
+		{% endfor %}
 	{% endif %}
 
 	</div>
 </div>
 {% endblock content %}
+
+
+{% block java_content %}
+<script>
+	$(document).ready(function(){
+		$("table tbody th, table tbody td").wrapInner("<div></div>");
+	}
+	);
+</script>
+{% endblock java_content %}

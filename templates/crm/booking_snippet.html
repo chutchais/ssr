@@ -1,80 +1,114 @@
-					<div class="page-header">
+					
+				
 						<h3>Booking : {{ object.name}} -- <small>{{ object.company}}</small></h3>
-						<a href="{% url 'crm:booking-vip' object.slug %}"><button type="button" class="btn btn-info">Re-calculate VIP Charge</button></a>
-						<a href="{% url 'crm:booking-resetvip' object.slug %}"><button type="button" class="btn btn-warning">Reset VIP</button></a>
-					</div>
-						<div class="col-xs-6 col-sm-6">
-							<table class="table table-hover">
-								<tr class="success">
-									<th>Vessel</th>
-									<th>Voy</th>
-									<th>Line</th>
-									<th>Agent</th>
-								</tr>
-								<tr >
-									<td>{{object.vessel}}</td>
-									<td>{{object.voy}}</td>
-									<td>{{object.line}}</td>
-									<td>{{object.agent}}</td>
-								</tr>
-								<tr class="success">
-									<th>Bill to</th>
-									<th>Customer</th>
-								</tr>
-								<tr>
-									<td>{{object.billed_to}}</td>
-									<td>{{object.customer}}</td>
-								</tr>
-							</table>
+						<div class="no-print">
+							<a href="{% url 'crm:booking-vip' object.slug %}"><button type="button" class="btn btn-info">Re-calculate VIP Charge</button></a>
+							<a href="{% url 'crm:booking-resetvip' object.slug %}"><button type="button" class="btn btn-warning">Reset VIP</button></a>
 						</div>
-						<div class="col-xs-6 col-sm-6">
-							<table class="table table-hover">
-								<tr class="success">
-									<th>VIP Detail</th>
-									<th></th>
-								</tr>
-								{% if object.vip %}
-								<tr><td>No back charge : <b>{{ object.vip.no_back_charge }}</b></td>
-									<td>Storage fee : <b>{{ object.vip.storage }}</b></td>
-								</tr>
-								<tr><td>Lift-On : <b>{{ object.vip.lifton }}</b></td>
-									<td>Re-Location: <b>{{ object.vip.reloc }}</b></td>
-								</tr>
-								{% endif %}
-							</table>
-						</div>
+
 						<div>
+							<div class="col-xs-6 col-sm-6">
+								<table class="table table-hover">
+									<tr class="success">
+										<th>Vessel</th>
+										<th>Voy</th>
+										<th>Line</th>
+										<th>Agent</th>
+									</tr>
+									<tr >
+										<td>{{object.vessel}}</td>
+										<td>{{object.voy}}</td>
+										<td>{{object.line}}</td>
+										<td>{{object.agent}}</td>
+									</tr>
+									<tr class="success">
+										<th>Bill to</th>
+										<th>Customer</th>
+									</tr>
+									<tr>
+										<td>{{object.billed_to}}</td>
+										<td>{{object.customer}}</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="col-xs-6 col-sm-6">
+								<table class="table table-hover">
+									<tr class="success">
+										<th>VIP Detail</th>
+										<th></th>
+									</tr>
+									{% if object.vip %}
+									<tr><td>No back charge : <b>{{ object.vip.no_back_charge }}</b></td>
+										<td>Storage fee : <b>{{ object.vip.storage }}</b></td>
+									</tr>
+									<tr><td>Lift-On : <b>{{ object.vip.lifton }}</b></td>
+										<td>Re-Location: <b>{{ object.vip.reloc }}</b></td>
+									</tr>
+									{% endif %}
+								</table>
+							</div>
+						</div>
+
+						<div>
+							
 							<table class="table table-bordered">
 								<tr>
 									<th>#</th>
-									<th>ISO</th>
-									<th>Length</th>
-									<th>In</th>
-									<th>Out</th>
-									<th>dWell</th>
+									<!-- <th>ISO</th> -->
+									<th class="text-center">Length</th>
+									<th class="text-center">In</th>
+									<th class="text-center">Out</th>
+									<th class="text-center">dWell</th>
 				<!-- 					<th>Charge#</th> -->
-									<th>1-7 days</th>
-									<th>8-14 days</th>
-									<th>Over 15 days</th>
-									<th>Lift-On</th>
-									<th>Re-Location</th>
+									<th class="text-center">1-7 days</th>
+									<th class="text-center">8-14 days</th>
+									<th class="text-center">Over 15 days</th>
+									<th class="text-center">Lift-On</th>
+									<th class="text-center">Re-Lo</th>
 								</tr>
 								{% for c in object.container_set.all %}
 									<tr>
 										<td>{{c.number}}</td>
-										<td>{{c.iso}}</td>
-										<td>{{c.container_size}}</td>
-										<td>{{c.in_date}}</td>
-										<td>{{c.out_date}}</td>
-										<td>{{c.dwell}}</td>
+										<!-- <td>{{c.iso}}</td> -->
+										<td class="text-center">{{c.container_size|floatformat:"0" }}</td>
+										<td class="text-center">{{c.in_date|date:"d-m-Y"}}</td>
+										<td class="text-center">{{c.out_date|date:"d-m-Y"}}</td>
+										<td class="text-center">{{c.dwell}}</td>
 										<!-- <td>{{c.charge}}</td> -->
-										<td>{{c.rate1}}</td>
-										<td>{{c.rate2}}</td>
-										<td>{{c.rate3}}</td>
-										<td>{{c.lifton_charge}}</td>
-										<td>{{c.relocation_charge}}</td>
+										<td class="text-center">{{c.rate1}}</td>
+										<td class="text-center">{{c.rate2}}</td>
+										<td class="text-center">{{c.rate3}}</td>
+										<td class="text-center">{{c.lifton}}</td>
+										<td class="text-center">{{c.reloc}}</td>
+								</tr>
+								{% endfor %}
+							</table>
+
+							<h3>Booking Summary</h3>
+							<table class="table table-bordered">
+								<tr>
+									<th class="text-center">Container Size</th>
+									<th class="text-center">Total dWell</th>
+				<!-- 					<th>Charge#</th> -->
+									<th class="text-center">1-7 days</th>
+									<th class="text-center">8-14 days</th>
+									<th class="text-center">Over 15 days</th>
+									<th class="text-center">Lift-On</th>
+									<th class="text-center">Re-Location</th>
+								</tr>
+								{% for c in object.get_summary %}
+									<tr>
+										<td class="text-center">{{c.container_size|floatformat:"0"}}</td>
+										<td class="text-center">{{c.total}}</td>
+										<!-- <td>{{c.charge}}</td> -->
+										<td class="text-center">{{c.rate1}}</td>
+										<td class="text-center">{{c.rate2}}</td>
+										<td class="text-center">{{c.rate3}}</td>
+										<td class="text-center">{{c.lifton}}</td>
+										<td class="text-center">{{c.reloc}}</td>
 								</tr>
 								{% endfor %}
 							</table>
 						</div>
-
+				

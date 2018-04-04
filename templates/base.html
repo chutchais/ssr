@@ -1,4 +1,6 @@
+
 {% load staticfiles %}
+
 
 <html lang="en">
   <head>
@@ -8,22 +10,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
-
-
-
-
-
     <title>{% block title %}{% endblock %}</title>
+
+     {% block style %}
+      {% endblock style %}
+
   </head>
   <body>
 
   <!-- Latest compiled and minified JavaScript -->
   <script src="{% static 'bootstrap/js/jquery-1.12.2.min.js' %}"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"></link>
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" media="screen,print"></link>
   <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}"></link>
+  <!-- <link rel="stylesheet" href="{% static 'bootstrap/css/print.css' %}"></link> -->
     <!-- Latest compiled and minified CSS -->
 
 
@@ -45,6 +45,7 @@
 <!-- <div class="container-fluid"> -->
       <div class="container" >
           {% include "nav.html" %}
+
           {% block head %}
           {% endblock head %}
           

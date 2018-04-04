@@ -164,8 +164,21 @@ class Booking(models.Model):
 				c.rate1=0
 				c.rate2=0
 				c.rate3=0
+				c.lifton =0
+				c.reloc = 0
 				c.save()
 		pass
+
+	def get_summary(self):
+		summary = self.container_set.all().values('container_size').annotate(
+			total=Sum('dwell'),
+			rate1 =Sum('rate1'),
+			rate2 =Sum('rate2'),
+			rate3 =Sum('rate3'),
+			lifton =Sum('lifton'),
+			reloc =Sum('reloc')
+			)
+		return summary
 
 
 class Container(models.Model):
@@ -183,6 +196,8 @@ class Container(models.Model):
 	rate1 = models.IntegerField(default=0)
 	rate2 = models.IntegerField(default=0)
 	rate3 = models.IntegerField(default=0)
+	lifton = models.IntegerField(default=0)
+	reloc = models.IntegerField(default=0)
 	status = models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
 	created_date = models.DateTimeField(auto_now_add=True)
 	modified_date = models.DateTimeField(blank=True, null=True,auto_now=True)
@@ -249,8 +264,15 @@ class Container(models.Model):
 			if self.booking.vip.no_back_charge > 14 :
 					rate3 = total_charge
 
+			lifton=0
+			if self.booking.vip.lifton:
+				lifton = 1
 
-			return total_charge,rate1,rate2,rate3
+			reloc=0
+			if self.booking.vip.reloc and self.dwell>7 :
+				reloc = 1 
+
+			return total_charge,rate1,rate2,rate3,lifton,reloc
 
 		return 0
 
@@ -259,6 +281,8 @@ class Container(models.Model):
 		self.rate1 = self.get_charge()[1]
 		self.rate2 = self.get_charge()[2]
 		self.rate3 = self.get_charge()[3]
+		self.lifton = self.get_charge()[4]
+		self.reloc = self.get_charge()[5]
 		# if self.booking.vip:
 		# 	if self.dwell > self.booking.vip.storage:
 		# 		self.charge = self.booking.vip.storage-self.dwell

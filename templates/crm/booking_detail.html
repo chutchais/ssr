@@ -8,11 +8,70 @@
     Booking List
 {% endblock %}
 
+{% block style %}
+<style>
+    @media print {
+     /* styles go here */
+         @page {                
+            size: A4;
+            margin: 0mm;
+          }
+
+          html, body {
+            width: 1024px;
+          }
+
+          body {
+            margin: 0 auto;
+            line-height: 1em;
+            word-spacing:1px;
+            letter-spacing:0.2px;
+            font: 14px "Times New Roman", Times, serif;
+            background:white;
+            color:black;
+            width: 100%;
+            float: none;
+          }
+
+
+                  a[href]:after {
+            content: none !important;
+          }
+
+        .no-print, .no-print *
+            {
+                display: none !important;
+            }
+
+        {
+          table { page-break-after:auto }
+          tr    { page-break-inside:avoid; page-break-after:auto }
+          td    { page-break-inside:avoid; page-break-after:auto }
+          thead { display:table-header-group }
+          tfoot { display:table-footer-group }
+        }
+
+    }
+</style>
+{% endblock style %}
 
 {% block content %}
 <div class="container">
-	<div class="row">
-		{% include "crm/booking_snippet.html" %}
-	</div>
+
+    {% include "crm/booking_snippet.html" %}
 </div>
 {% endblock content %}
+
+{% block java_content %}
+<script>
+	
+function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+     document.body.innerHTML = printContents;
+     window.print();
+     document.body.innerHTML = originalContents;
+}
+
+</script>
+{% endblock java_content %}
