@@ -5,8 +5,10 @@ from .models import (Agent,
 					Booking,
 					BookingFile,
 					BillTo,
+                    Charge,
 					Container,
 					Customer,
+                    Extra_Charge,
 					Line,
 					Vessel,
 					Vip)
@@ -15,6 +17,7 @@ admin.site.register(Agent)
 # admin.site.register(Company)
 admin.site.register(BookingFile)
 admin.site.register(BillTo)
+admin.site.register(Charge)
 admin.site.register(Container)
 admin.site.register(Customer)
 admin.site.register(Line)
@@ -23,12 +26,12 @@ admin.site.register(Vessel)
 
 
 class BookingAdmin(admin.ModelAdmin):
-    search_fields = ['name','company','voy','line','agent','customer','vessel']
+    search_fields = ['name','ssr_code','company','voy','line','agent','customer','vessel']
     list_filter = ['line','agent','customer','vessel']
-    list_display = ('__str__','company','voy','line','agent','customer','vessel','vip')
+    list_display = ('__str__','ssr_code','company','voy','line','agent','customer','vessel','vip')
     # list_editable = ('color','move_performa')
     fieldsets = [
-        ('Basic Information',{'fields': ['name','company']}),
+        ('Basic Information',{'fields': ['name','ssr_code','company']}),
         ]
 admin.site.register(Booking,BookingAdmin)
 
@@ -44,3 +47,14 @@ class VipAdmin(admin.ModelAdmin):
         ('Charge',{'fields': [('lifton','reloc')]}),
         ]
 admin.site.register(Vip,VipAdmin)
+
+
+class ExtraChargeAdmin(admin.ModelAdmin):
+    search_fields = ['booking','container','charge','remark']
+    list_filter = ['charge']
+    list_display = ('__str__','booking','container','charge','remark')
+    # list_editable = ('color','move_performa')
+    fieldsets = [
+        ('Basic Information',{'fields': ['booking','container','charge','remark','slug']}),
+        ]
+admin.site.register(Extra_Charge,ExtraChargeAdmin)

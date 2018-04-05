@@ -3,9 +3,10 @@ account/*.pyc
 account/migrations/*.pyc
 account/migrations/*.py
 crm/*.pyc
-crm/migrations/*.pyc
-crm/migrations/*.py
+
 crm/__pycache__/*.pyc
 crm/__pycache__/*.*
 db.sqlite3
 *.sqlite3
+
+

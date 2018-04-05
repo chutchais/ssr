@@ -111,22 +111,23 @@ class BillTo(models.Model):
 		return reverse('crm:detail', kwargs={'slug':self.slug})
 
 class Booking(models.Model):
-	name = models.CharField(verbose_name ='Booking Number',max_length=50)
-	slug = models.SlugField(unique=True,blank=True, null=True)
-	booking_file = models.ForeignKey(BookingFile,blank=True, null=True)
-	company = models.ForeignKey(Company,blank=True, null=True)
-	voy = models.CharField(verbose_name ='Voyage',max_length=50,blank=True, null=True)
-	line = models.ForeignKey('Line',blank=True, null=True)
-	agent = models.ForeignKey('Agent',blank=True, null=True)
-	customer  = models.ForeignKey('Customer',blank=True, null=True)
-	billed_to = models.ForeignKey('BillTo', blank=True, null=True)
-	vessel  = models.ForeignKey('Vessel', blank=True, null=True)
-	vip = models.ForeignKey('Vip',blank=True, null=True)#ForeignKey('Vip', blank=True, null=True)
-	description = models.CharField(max_length=255,blank=True, null=True)
-	status = models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
-	created_date = models.DateTimeField(auto_now_add=True)
-	modified_date = models.DateTimeField(blank=True, null=True,auto_now=True)
-	user = models.ForeignKey('auth.User',blank=True,null=True)
+	name 			= models.CharField(verbose_name ='Booking Number',max_length=50)
+	ssr_code 		= models.CharField(verbose_name ='SSR Code',max_length=20,blank=True, null=True)
+	slug 			= models.SlugField(unique=True,blank=True, null=True)
+	booking_file 	= models.ForeignKey(BookingFile,blank=True, null=True)
+	company 		= models.ForeignKey(Company,blank=True, null=True)
+	voy 			= models.CharField(verbose_name ='Voyage',max_length=50,blank=True, null=True)
+	line 			= models.ForeignKey('Line',blank=True, null=True)
+	agent 			= models.ForeignKey('Agent',blank=True, null=True)
+	customer  		= models.ForeignKey('Customer',blank=True, null=True)
+	billed_to 		= models.ForeignKey('BillTo', blank=True, null=True)
+	vessel  		= models.ForeignKey('Vessel', blank=True, null=True)
+	vip 			= models.ForeignKey('Vip',blank=True, null=True)#ForeignKey('Vip', blank=True, null=True)
+	description 	= models.CharField(max_length=255,blank=True, null=True)
+	status 			= models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
+	created_date 	= models.DateTimeField(auto_now_add=True)
+	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
+	user 			= models.ForeignKey('auth.User',blank=True,null=True)
 	
 	def __str__(self):
 		return self.name
@@ -291,19 +292,45 @@ class Container(models.Model):
 		# 		self.charge =  self.dwell - self.booking.vip.no_back_charge
 		# pass
 
+class Charge(models.Model):
+	name 			= models.CharField(unique=True,verbose_name ='Charge name',max_length=100)
+	status 			= models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
+	created_date 	= models.DateTimeField(auto_now_add=True)
+	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
+	user 			= models.ForeignKey('auth.User',blank=True,null=True)
+	
+	def __str__(self):
+		return ('%s' % self.name)
+
+class Extra_Charge(models.Model):
+	booking         = models.ForeignKey('Booking',blank=True, null=True)
+	container 		= models.ForeignKey('Container',blank=True, null=True)
+	charge 			= models.ForeignKey('Charge')
+	slug 			= models.SlugField(unique=True,blank=True, null=True)
+	remark			= models.TextField()
+	qty				= models.IntegerField(default=1)
+	status 			= models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
+	created_date 	= models.DateTimeField(auto_now_add=True)
+	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
+	user 			= models.ForeignKey('auth.User',blank=True,null=True)
+	
+	def __str__(self):
+		return ('%s - %s' % (self.booking,self.charge))
+
+
 class Vip(models.Model):
-	start_date = models.DateTimeField(blank=True, null=True)
-	end_date =  models.DateTimeField(blank=True, null=True)
-	line = models.ForeignKey('Line',blank=True, null=True)
-	consignee = models.ForeignKey('Customer',blank=True, null=True)
-	no_back_charge = models.IntegerField(default=0)
-	storage = models.IntegerField(default=0)
-	lifton = models.BooleanField(default=False)
-	reloc = models.BooleanField(default=False)
-	status = models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
-	created_date = models.DateTimeField(auto_now_add=True)
-	modified_date = models.DateTimeField(blank=True, null=True,auto_now=True)
-	user = models.ForeignKey('auth.User',blank=True,null=True)
+	start_date 		= models.DateTimeField(blank=True, null=True)
+	end_date 		=  models.DateTimeField(blank=True, null=True)
+	line 			= models.ForeignKey('Line',blank=True, null=True)
+	consignee 		= models.ForeignKey('Customer',blank=True, null=True)
+	no_back_charge 	= models.IntegerField(default=0)
+	storage 		= models.IntegerField(default=0)
+	lifton 			= models.BooleanField(default=False)
+	reloc 			= models.BooleanField(default=False)
+	status 			= models.CharField(max_length=1,choices=STATUS_CHOICES,default=ACTIVE)
+	created_date 	= models.DateTimeField(auto_now_add=True)
+	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
+	user 			= models.ForeignKey('auth.User',blank=True,null=True)
 	
 	def __str__(self):
 		return ('%s-%s' % (self.line,self.consignee))
@@ -330,6 +357,15 @@ def create_number_slug(model,instance, new_slug=None):
     if exists:
         new_slug = "%s-%s" %(slug, qs.count()+1)
         return create_slug(model,instance, new_slug=new_slug)
+    return slug
+
+def create_text_slug(model,instance, new_slug=None):
+    slug = slugify(new_slug)
+    qs = model.objects.filter(slug=slug).order_by("-id")
+    exists = qs.exists()
+    if exists:
+        new_slug = "%s-%s" %(slug, qs.count()+1)
+        return create_text_slug(model,instance, new_slug=new_slug)
     return slug
 
 
@@ -367,11 +403,19 @@ def pre_save_billto_receiver(sender, instance, *args, **kwargs):
 def pre_save_booking_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(Booking,instance)
+    if not instance.ssr_code:
+    	instance.ssr_code = '%s-CRM-0000000' % ('A' if instance.company.name == 'LCMT' else 'B')
 
 # Container
 def pre_save_container_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_number_slug(Container,instance)
+
+# Extra Charge
+def pre_save_extra_charge_receiver(sender, instance, *args, **kwargs):
+	if not instance.slug:
+		slug = '%s-%s' % (instance.booking,instance.container)
+		instance.slug = create_text_slug(Extra_Charge,instance,slug)
 
 pre_save.connect(pre_save_bookingfile_receiver, sender=BookingFile)
 pre_save.connect(pre_save_agent_receiver, sender=Agent)
@@ -381,3 +425,4 @@ pre_save.connect(pre_save_container_receiver, sender=Container)
 pre_save.connect(pre_save_customer_receiver, sender=Customer)
 pre_save.connect(pre_save_line_receiver, sender=Line)
 pre_save.connect(pre_save_vessel_receiver, sender=Vessel)
+pre_save.connect(pre_save_extra_charge_receiver, sender=Extra_Charge)

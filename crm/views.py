@@ -15,17 +15,18 @@ from django.db.models import Q,F
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy,reverse
 
 from django.views.generic.edit import FormMixin
 
-from .forms import BookingFileForm
+from .forms import BookingFileForm,ExtraChargeFileForm
 from .models import (Agent,
 					BillTo,
 					Booking,
 					BookingFile,
 					Customer,
 					Container,
+					Extra_Charge,
 					Line,
 					Vessel,
 					Vip)
@@ -279,7 +280,13 @@ class BookingFileCreateView(LoginRequiredMixin,CreateView):
 		kwargs = super(BookingFileCreateView,self).get_form_kwargs()
 		# kwargs['instance'] = Item.objects.filter(user=self.request.user).first()
 		# print ('Kwarg %s' % self.request)
+		
 		return kwargs
+
+		# def get_form_kwargs(self):
+  #       kwargs = super(FolderCreate, self).get_form_kwargs()
+  #       kwargs['user'] = self.request.user
+  #       return kwargs
 
 	# # def get_queryset(self):
 	# # 	return Item.objects.filter(user=self.request.user)
@@ -290,7 +297,6 @@ class BookingFileCreateView(LoginRequiredMixin,CreateView):
 	def get_context_data(self,*args,**kwargs):
 		context = super(BookingFileCreateView,self).get_context_data(*args,**kwargs)
 		context['title']='Upload Booking List File'
-		# context['voy']= 'Add Cut-Off Datetime'
 		return context
 
 
@@ -340,3 +346,73 @@ def BookingResetVip(request,slug):
 	booking = get_object_or_404(Booking, slug=slug)
 	booking.clear_vip()
 	return redirect(reverse_lazy( 'crm:booking-detail', kwargs={'slug': slug}))
+
+class ExtraChargeDeleteView(LoginRequiredMixin,DeleteView):
+	model = Extra_Charge
+
+	def get_object(self, queryset=None):
+		obj = super(ExtraChargeDeleteView, self).get_object()
+		# print ('Delete %s' % obj)
+		return obj
+
+	def get_success_url(self):
+	# Assuming there is a ForeignKey from Comment to Post in your model
+		# booking = self.object.voy 
+		# print (voy)
+		return reverse_lazy( 'crm:booking-detail', kwargs={'slug': self.object.booking.slug})
+
+class ExtraChargeUpdateView(LoginRequiredMixin,UpdateView):
+	model = Extra_Charge
+	template_name = 'form.html'
+	form_class = ExtraChargeFileForm
+
+	def get_form_kwargs(self):
+		kwargs = super(ExtraChargeUpdateView,self).get_form_kwargs()
+		kwargs['slug'] = self.kwargs.get('slug')
+		# kwargs['booking'] = Booking.objects.get(slug=self.kwargs.get('slug'))
+		return kwargs
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(ExtraChargeUpdateView,self).get_context_data(*args,**kwargs)
+		context['title']='Edit Extra Charge'
+		return context
+
+	def get_success_url(self,*args, **kwargs):
+		slug = self.kwargs.get('slug')
+		extra = Extra_Charge.objects.get(slug=slug)
+		# booking_slug = Booking.objects.get(slug=extra.booking.slug)
+		url = reverse('crm:booking-detail',kwargs={'slug':extra.booking.slug})
+		return url
+
+class ExtraChargeCreateView(LoginRequiredMixin,CreateView):
+	template_name = 'form.html'
+	form_class = ExtraChargeFileForm
+
+	def get_form_kwargs(self):
+		kwargs = super(ExtraChargeCreateView,self).get_form_kwargs()
+		kwargs['slug'] = self.kwargs.get('slug')
+		# kwargs['booking'] = Booking.objects.get(slug=self.kwargs.get('slug'))
+		return kwargs
+
+	# def get_initial(self):
+	# 	booking = get_object_or_404(Booking, slug=self.kwargs.get('slug'))
+	# 	# print(booking)
+	# 	return {
+	# 		'book':booking,
+	# 	}
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(ExtraChargeCreateView,self).get_context_data(*args,**kwargs)
+		context['title']='Upload Extra Charge'
+		return context
+
+	def get_success_url(self,*args, **kwargs):
+		slug = self.kwargs.get('slug')
+		url = reverse('crm:booking-detail',kwargs={'slug':slug})
+		return url
+
+	def form_valid(self,form):
+		booking = get_object_or_404(Booking, slug=self.kwargs.get('slug'))
+		form.instance.booking = booking
+		obj = form.save(commit=False)
+		return super(ExtraChargeCreateView,self).form_valid(form)
