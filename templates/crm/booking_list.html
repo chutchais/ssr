@@ -23,6 +23,7 @@
 				<table class="table table-bordered">
 					<tr>
 						<th>Name</th>
+						<th>SSR#</th>
 				        <th>Voy</th>
 				        <th>Company</th>
 				        <th>Line</th>
@@ -34,12 +35,15 @@
 				        <th>#Total charge</th>
 				        <th>Vip</th>
 				        <th>Datetime</th>
+				        <th>Status</th>
 				      </tr>
 
 					
 						{% for b in object_list %}
 						<tr>
 					 	<td><a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a></td>
+					 	<td><a href="{% url 'crm:booking-update' b.slug  %}?next=
+					 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
 					 	<td>{{ b.voy }}</td>
 					 	<td>{{ b.company }}</td>
 					 	<td>{{ b.line }}</td>
@@ -58,8 +62,20 @@
 
 					 	</td>
 					 	<td>{{ b.created_date }}</td>
+
+					 	<td>
+					 		{% if b.draft %}
+					 			
+					 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
+					 			Send to Approve
+					 		</a>
+					 		{% endif %}
+					 	</td>
+
 					 	{% empty %}
 					 		<td>No list</td>
+					 	
+					 	
 					 	</tr>
 					 	{% endfor %}
 					 

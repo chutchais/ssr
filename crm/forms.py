@@ -1,7 +1,17 @@
 from django import forms
 from django.core.validators import RegexValidator
 from django.forms import ModelForm
-from .models import BookingFile,Extra_Charge,Container,Booking
+from .models import Booking,BookingFile,Extra_Charge,Container,Booking
+
+
+class BookingForm(ModelForm):
+	class Meta:
+		model = Booking
+		fields = ['ssr_code','remark','draft']
+
+	# def __init__(self, *args, **kwargs):
+	# 	super(BookingForm, self).__init__(*args, **kwargs)
+	# 	self.redirect = 'cc'
 
 class BookingFileForm(ModelForm):
 	class Meta:
@@ -12,7 +22,7 @@ class BookingFileForm(ModelForm):
 class ExtraChargeFileForm(ModelForm):
 	class Meta:
 		model = Extra_Charge
-		fields = ['container','charge','remark','status']
+		fields = ['container','charge','remark','qty','status']
 
 	def __init__(self, *args, **kwargs):
 		slug = kwargs.pop('slug')

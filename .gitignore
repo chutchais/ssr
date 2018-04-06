@@ -6,6 +6,8 @@ crm/*.pyc
 
 crm/__pycache__/*.pyc
 crm/__pycache__/*.*
+crm/migrations/*.pyc
+crm/migrations/*.py
 db.sqlite3
 *.sqlite3
 

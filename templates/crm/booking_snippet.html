@@ -1,6 +1,7 @@
 					
 				
-						<h3>{{ object.company}} Booking : {{ object.name}} -- SSR Code : {{ object.ssr_code }}</h3>
+						<h3>{{ object.company}} Booking : {{ object.name}} -- 
+							SSR Code : <a href="{% url 'crm:booking-update' object.slug %}">{{ object.ssr_code }} </a></h3>
 						
 						<div class="no-print">
 							<a href="{% url 'crm:booking-vip' object.slug %}"><button type="button" class="btn btn-info">Re-calculate VIP Charge</button></a>

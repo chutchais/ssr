@@ -16,10 +16,12 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy,reverse
+# from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.views.generic.edit import FormMixin
 
-from .forms import BookingFileForm,ExtraChargeFileForm
+from .forms import BookingFileForm,ExtraChargeFileForm,BookingForm
 from .models import (Agent,
 					BillTo,
 					Booking,
@@ -261,7 +263,9 @@ class BookingFileDetailView(LoginRequiredMixin,DetailView):
 		return context
 
 
-class BookingFileCreateView(LoginRequiredMixin,CreateView):
+
+class BookingFileCreateView(PermissionRequiredMixin,LoginRequiredMixin,CreateView):
+	permission_required = 'crm.can_upload_file'
 	template_name = 'form.html'
 	form_class = BookingFileForm
 
@@ -310,12 +314,13 @@ class BookingListView(LoginRequiredMixin,ListView):
 		query = self.request.GET.get('q')
 		if query :
 			return Booking.objects.filter(Q(name__icontains=query)|
+				Q(ssr_code__icontains=query)|
 				Q(voy__icontains=query)|
 				Q(line__name__icontains=query)|
 				Q(vessel__name__icontains=query)|
 				Q(company__name__icontains=query)|
-				Q(customer__name__icontains=query))
-		return Booking.objects.all()
+				Q(customer__name__icontains=query)).order_by('-id')
+		return Booking.objects.all().order_by('-id')
 
 class BookingDetailView(LoginRequiredMixin,DetailView):
 	model = Booking
@@ -336,7 +341,21 @@ def BookingVip(request,slug):
 	booking = get_object_or_404(Booking, slug=slug)
 	booking.perform_charge()
 	print ('Re-cal VIP')
-	return redirect(reverse_lazy( 'crm:booking-detail', kwargs={'slug': slug}))
+	return redirect(reverse_lazy('crm:booking-detail', kwargs={'slug': slug}))
+
+def BookingSendApprove(request,slug):
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	if not request.user.has_perm('crm.can_send_approve'):
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	from django.db.models import Avg,Min,Max
+	booking = get_object_or_404(Booking, slug=slug)
+	booking.draft=False
+	booking.save()
+
+	return redirect(reverse_lazy( 'crm:booking-list'))
 
 def BookingResetVip(request,slug):
 	if not request.user.is_authenticated:
@@ -416,3 +435,38 @@ class ExtraChargeCreateView(LoginRequiredMixin,CreateView):
 		form.instance.booking = booking
 		obj = form.save(commit=False)
 		return super(ExtraChargeCreateView,self).form_valid(form)
+
+
+class BookingUpdateView(LoginRequiredMixin,UpdateView):
+	model = Booking
+	template_name = 'form.html'
+	form_class = BookingForm
+	
+
+	#  return a dictionary with the kwargs that will be passed to the __init__ of your form
+	def get_form_kwargs(self):
+		kwargs = super(BookingUpdateView,self).get_form_kwargs()
+		redirect = self.request.GET.get('next')
+		print (redirect)
+
+		if redirect:
+			if 'initial' in kwargs.keys():
+				kwargs['initial'].update({'next': redirect})
+			else:
+				kwargs['initial'] = {'next': redirect}
+		return kwargs
+
+	def get_success_url(self,*args, **kwargs):
+		slug = self.kwargs.get('slug')
+		# Original
+		# url = reverse('crm:booking-detail',kwargs={'slug':slug})
+		url = reverse('crm:booking-list')
+		return url
+		# return url
+
+	# Passing Data to Template
+	def get_context_data(self,*args,**kwargs):
+		context = super(BookingUpdateView,self).get_context_data(*args,**kwargs)
+		context['title']='Change SSR Code and Confirmation'
+		context['next']= self.request.GET.get('next')
+		return context

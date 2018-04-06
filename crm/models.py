@@ -26,6 +26,9 @@ class BookingFile(models.Model):
 	modified_date = models.DateTimeField(blank=True, null=True,auto_now=True)
 	user = models.ForeignKey('auth.User',blank=True,null=True)
 
+	class Meta:
+		permissions = [('can_upload_file','Can Upload Booking file')]
+
 	def __str__(self):
 		return ('%s' % (self.name))
 
@@ -128,6 +131,16 @@ class Booking(models.Model):
 	created_date 	= models.DateTimeField(auto_now_add=True)
 	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
 	user 			= models.ForeignKey('auth.User',blank=True,null=True)
+	remark			= models.TextField(blank=True,null=True)
+	draft			= models.BooleanField(default=True)
+	approved		= models.BooleanField(default=False)
+	approve_date	= models.DateTimeField(blank=True, null=True)
+	received		= models.BooleanField(default=False)
+	receive_date	= models.DateTimeField(blank=True, null=True)
+
+	class Meta:
+		permissions = [('can_send_approve','Can send for approval'),
+						('can_approve','Can approve booking')]
 	
 	def __str__(self):
 		return self.name
@@ -404,7 +417,9 @@ def pre_save_booking_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(Booking,instance)
     if not instance.ssr_code:
-    	instance.ssr_code = '%s-CRM-0000000' % ('A' if instance.company.name == 'LCMT' else 'B')
+        from datetime import datetime
+        year = datetime.strftime(datetime.now(),'%y')
+        instance.ssr_code = '%s-CRM-%s00000' % ('A' if instance.company.name == 'LCMT' else 'B',year)
 
 # Container
 def pre_save_container_receiver(sender, instance, *args, **kwargs):

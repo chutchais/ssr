@@ -18,13 +18,14 @@ from django.contrib import admin
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.conf import settings
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView,LogoutView
 
 
 urlpatterns = [
     url(r'^', include('crm.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^login/', LoginView.as_view(),name='login'),
+    url(r'^logout/', LogoutView.as_view(),name='logout'),
 	url(r'^account/', include('account.urls',namespace='account')),
 	url(r'^crm/', include('crm.urls',namespace='crm')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -12,7 +12,12 @@
 {% block content %}
 <div class="container">
 	<div class="row">
-				<h3>Booking File List       <small><a href="{% url 'crm:create'%}">create</a></small></h3>
+				<h3>Booking File List       <small>
+
+					{% if perms.crm.can_upload_file %}
+						<a href="{% url 'crm:create'%}">create</a></small>
+					{% endif %}
+				</h3>
 
 					<form class='form' method='GET' action='.'>
 						<input type='text' id='search' placeholder="Search filename.." name="q" value='{{ request.GET.q}}'>
