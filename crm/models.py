@@ -137,10 +137,14 @@ class Booking(models.Model):
 	approve_date	= models.DateTimeField(blank=True, null=True)
 	received		= models.BooleanField(default=False)
 	receive_date	= models.DateTimeField(blank=True, null=True)
+	invoice         = models.CharField(max_length=30,blank=True, null=True) 
 
 	class Meta:
 		permissions = [('can_send_approve','Can send for approval'),
-						('can_approve','Can approve booking')]
+						('can_approve','Can approve booking'),
+						('can_modify_invoice','Can modify invoice'),
+						('can_modify_ssr','Can modify ssr number'),
+						('can_modify_vip','Can modify VIP')]
 	
 	def __str__(self):
 		return self.name
@@ -327,9 +331,13 @@ class Extra_Charge(models.Model):
 	modified_date 	= models.DateTimeField(blank=True, null=True,auto_now=True)
 	user 			= models.ForeignKey('auth.User',blank=True,null=True)
 	
+	class Meta:
+		permissions = [('can_modify_extracharge','Can modify extra charge')]
+						
 	def __str__(self):
 		return ('%s - %s' % (self.booking,self.charge))
 
+						# ('can_modify_extracharge','Can modify extra charge')
 
 class Vip(models.Model):
 	start_date 		= models.DateTimeField(blank=True, null=True)

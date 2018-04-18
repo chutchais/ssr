@@ -78,27 +78,32 @@
 					 	Process : {{ object.uploaded }} <br>
 					 	Process on :{{ object.upload_date }} <br>
 					 	<br>
-					 	{% if not object.uploaded %}
-					 		<a href="{% url 'crm:process' object.slug %}"><button type="button" class="btn btn-primary">Process</button></a>
-					 	{% endif %}
+
+            {% if perms.bookingfile.can_upload_file %}
+  					 	{% if not object.uploaded %}
+  					 		<a href="{% url 'crm:process' object.slug %}"><button type="button" class="btn btn-primary">Process</button></a>
+  					 	{% endif %}
+            {% endif %}
 
 
 
-				{% if object.booking_set %}
+				  {% if object.booking_set and perms.bookingfile.can_upload_file %}
 					<a href="{% url 'crm:delete' object.slug %}"><button type="button" class="btn btn-danger">Delete Booking File</button></a>
+          {% endif %}
 
-					{% if object.booking_set.count %}
+					{% if object.booking_set.count and perms.booking.can_modify_vip %}
 					<a href="{% url 'crm:vip' object.slug %}"><button type="button" class="btn btn-primary">Calulate VIP Charge</button></a>
 					{% endif %}
-		</div>
-		<hr/>
-		{% for object in object.booking_set.all %}
-			
-			{% include "crm/booking_snippet.html" %}
-			<div class="page-break">
-			</div>
-		{% endfor %}
-	{% endif %}
+      		</div>
+      		<hr/>
+      		{% for object in object.booking_set.all %}
+      			
+      			{% include "crm/booking_snippet.html" %}
+            <hr>
+      			<div class="page-break">
+      			</div>
+      		{% endfor %}
+	   
 
 	</div>
 </div>

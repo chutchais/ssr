@@ -15,7 +15,8 @@ from .views import (BookingFileListView,
 					ExtraChargeUpdateView,
 					ExtraChargeDeleteView,
 					BookingUpdateView,
-					BookingSendApprove)
+					BookingSendApprove,
+					BookingInvoiceUpdateView)
 
 urlpatterns = [ 
 	url(r'^$',BookingListView.as_view(),name='home'),
@@ -29,6 +30,7 @@ urlpatterns = [
 
 	url(r'^booking/$', BookingListView.as_view(),name='booking-list'),
 	url(r'^booking/(?P<slug>[-\w]+)/$', BookingDetailView.as_view(), name='booking-detail'),
+	url(r'^booking/(?P<slug>[-\w]+)/invoice/$', BookingInvoiceUpdateView.as_view(), name='booking-invoice'),
 	url(r'^booking/(?P<slug>[-\w]+)/update/$', BookingUpdateView.as_view(), name='booking-update'),
 	url(r'^booking/(?P<slug>[-\w]+)/create-extra/$',ExtraChargeCreateView.as_view(),name='extra-create'),
 	url(r'^booking/(?P<slug>[-\w]+)/vip$', BookingVip, name='booking-vip'),

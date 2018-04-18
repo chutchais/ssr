@@ -4,6 +4,11 @@ from django.forms import ModelForm
 from .models import Booking,BookingFile,Extra_Charge,Container,Booking
 
 
+class BookingInvoiceForm(ModelForm):
+	class Meta:
+		model = Booking
+		fields = ['invoice']
+
 class BookingForm(ModelForm):
 	class Meta:
 		model = Booking

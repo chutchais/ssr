@@ -8,6 +8,19 @@
     Booking List
 {% endblock %}
 
+{% block style %}
+<style>
+	.table td.fit{
+	    white-space: nowrap;
+	    width: 1%;
+	}, 
+	.table th.fit {
+	    white-space: nowrap;
+	    width: 1%;
+	}
+</style>
+{% endblock style %}
+
 
 {% block content %}
 <div class="container">
@@ -24,11 +37,12 @@
 					<tr>
 						<th>Name</th>
 						<th>SSR#</th>
-				        <th>Voy</th>
+				        <th>Invoice#</th>
 				        <th>Company</th>
 				        <th>Line</th>
 				        <!-- <th>Agent</th> -->
 				        <th>Vessel</th>
+				        <th>Voy</th>
 				        <th>Customer</th>
 				        <th>#Container</th>
 				        <th>#Total dWell</th>
@@ -41,14 +55,29 @@
 					
 						{% for b in object_list %}
 						<tr>
-					 	<td><a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a></td>
-					 	<td><a href="{% url 'crm:booking-update' b.slug  %}?next=
-					 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
-					 	<td>{{ b.voy }}</td>
+					 	<td nowrap>
+					 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+					 	</td>
+					 	
+					 	{% if perms.crm.can_modify_ssr %}
+						 	<td nowrap><a href="{% url 'crm:booking-update' b.slug  %}?next=
+						 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
+					 	{% else %}
+					 		<td nowrap>{{ b.ssr_code }}</td>
+					 	{% endif %}
+
+					 	{% if perms.crm.can_modify_invoice %}
+						 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
+						 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"" }}</a></td>
+					 	{% else %}
+					 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
+					 	{% endif %}
+
 					 	<td>{{ b.company }}</td>
 					 	<td>{{ b.line }}</td>
 					 	<!-- <td>{{ b.agent }}</td> -->
 					 	<td><small>{{ b.vessel }}</small></td>
+					 	<td>{{ b.voy }}</td>
 					 	<td><small>{{ b.customer }}</small></td>
 					 	<td>{{ b.container_set.count }}</td>
 					 	<td>{{ b.dwell_total }}</td>
@@ -65,10 +94,11 @@
 
 					 	<td>
 					 		{% if b.draft %}
-					 			
-					 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
-					 			Send to Approve
-					 		</a>
+					 			{% if perms.crm.can_send_approve %}
+							 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
+							 			Send to Approve
+							 		</a>
+							 	{% endif %}
 					 		{% endif %}
 					 	</td>
 

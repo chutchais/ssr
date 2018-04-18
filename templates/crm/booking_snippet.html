@@ -1,12 +1,36 @@
 					
 				
-						<h3>{{ object.company}} Booking : {{ object.name}} -- 
-							SSR Code : <a href="{% url 'crm:booking-update' object.slug %}">{{ object.ssr_code }} </a></h3>
+						<h3>{{ object.company}} Booking : {{ object.name}} 
+
+							--SSR Code : 
+							{% if perms.crm.can_modify_ssr %}
+								<a href="{% url 'crm:booking-update' object.slug %}">
+									{{ object.ssr_code }}
+								</a>
+							{% else %}
+								{{ object.ssr_code }}
+							{% endif %}
+							<br>
+
+							Invoice : 
+
+							
+							{% if perms.crm.can_modify_invoice %}
+								<a href="{% url 'crm:booking-invoice' object.slug %}">
+									{{ object.invoice|default_if_none:"[Not Assigned]" }}
+								</a>
+							{% else %}
+								{{ object.invoice|default_if_none:"[Not Assigned]" }}
+							{% endif %}
+						</h3>
 						
-						<div class="no-print">
-							<a href="{% url 'crm:booking-vip' object.slug %}"><button type="button" class="btn btn-info">Re-calculate VIP Charge</button></a>
-							<a href="{% url 'crm:booking-resetvip' object.slug %}"><button type="button" class="btn btn-warning">Reset VIP</button></a>
-						</div>
+
+						{% if perms.crm.can_modify_vip %}
+							<div class="no-print">
+								<a href="{% url 'crm:booking-vip' object.slug %}"><button type="button" class="btn btn-info">Re-calculate VIP Charge</button></a>
+								<a href="{% url 'crm:booking-resetvip' object.slug %}"><button type="button" class="btn btn-warning">Reset VIP</button></a>
+							</div>
+						{% endif %}
 
 						<div class="row">
 							<div class="col-xs-8 col-sm-8">
@@ -82,11 +106,13 @@
 								{% endfor %}
 							</table>
 
-							
-							
+							<!-- {{ perms.booking }} -->
+							{% if perms.crm.can_modify_extracharge  %}
 								<div class="no-print">
 								<a href="{% url 'crm:extra-create' object.slug %}"><button type="button" class="btn btn-warning">Create Extra Charge</button></a>
 								</div>
+							{% endif %}
+
 							{% if object.extra_charge_set.count %}
 							<h3>Extra Cost Charge</h3>
 							<table class="table table-bordered">
@@ -109,8 +135,10 @@
 											<td class="text-center">{{ex.qty}}</td>
 											
 											<td class="no-print">
-												<a href="{% url 'crm:extra-edit' ex.slug %}">Edit</a>
-												<a href="{% url 'crm:extra-delete' ex.slug %}">Delete</a>
+												{% if perms.crm.can_modify_extracharge %}
+													<a href="{% url 'crm:extra-edit' ex.slug %}">Edit</a>
+													<a href="{% url 'crm:extra-delete' ex.slug %}">Delete</a>
+												{% endif %}
 											</td>	
 																		
 										</tr>

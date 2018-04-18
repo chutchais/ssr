@@ -21,7 +21,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.views.generic.edit import FormMixin
 
-from .forms import BookingFileForm,ExtraChargeFileForm,BookingForm
+from .forms import BookingFileForm,ExtraChargeFileForm,BookingForm,BookingInvoiceForm
 from .models import (Agent,
 					BillTo,
 					Booking,
@@ -319,7 +319,8 @@ class BookingListView(LoginRequiredMixin,ListView):
 				Q(line__name__icontains=query)|
 				Q(vessel__name__icontains=query)|
 				Q(company__name__icontains=query)|
-				Q(customer__name__icontains=query)).order_by('-id')
+				Q(customer__name__icontains=query)|
+				Q(invoice__icontains=query)).order_by('-id')
 		return Booking.objects.all().order_by('-id')
 
 class BookingDetailView(LoginRequiredMixin,DetailView):
@@ -468,5 +469,39 @@ class BookingUpdateView(LoginRequiredMixin,UpdateView):
 	def get_context_data(self,*args,**kwargs):
 		context = super(BookingUpdateView,self).get_context_data(*args,**kwargs)
 		context['title']='Change SSR Code and Confirmation'
+		context['next']= self.request.GET.get('next')
+		return context
+
+class BookingInvoiceUpdateView(LoginRequiredMixin,UpdateView):
+	model = Booking
+	template_name = 'form.html'
+	form_class = BookingInvoiceForm
+	
+
+	#  return a dictionary with the kwargs that will be passed to the __init__ of your form
+	def get_form_kwargs(self):
+		kwargs = super(BookingInvoiceUpdateView,self).get_form_kwargs()
+		redirect = self.request.GET.get('next')
+		print (redirect)
+
+		if redirect:
+			if 'initial' in kwargs.keys():
+				kwargs['initial'].update({'next': redirect})
+			else:
+				kwargs['initial'] = {'next': redirect}
+		return kwargs
+
+	def get_success_url(self,*args, **kwargs):
+		slug = self.kwargs.get('slug')
+		# Original
+		# url = reverse('crm:booking-detail',kwargs={'slug':slug})
+		url = reverse('crm:booking-list')
+		return url
+		# return url
+
+	# Passing Data to Template
+	def get_context_data(self,*args,**kwargs):
+		context = super(BookingInvoiceUpdateView,self).get_context_data(*args,**kwargs)
+		context['title']='Update Invoice information'
 		context['next']= self.request.GET.get('next')
 		return context
