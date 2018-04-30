@@ -381,7 +381,7 @@ def create_number_slug(model,instance, new_slug=None):
     exists = qs.exists()
     if exists:
         new_slug = "%s-%s" %(slug, qs.count()+1)
-        return create_slug(model,instance, new_slug=new_slug)
+        return create_number_slug(model,instance, new_slug=new_slug)
     return slug
 
 def create_text_slug(model,instance, new_slug=None):
@@ -431,7 +431,9 @@ def pre_save_booking_receiver(sender, instance, *args, **kwargs):
     if not instance.ssr_code:
         from datetime import datetime
         year = datetime.strftime(datetime.now(),'%y')
-        instance.ssr_code = '%s-CRM-%s00000' % ('A' if instance.company.name == 'LCMT' else 'B',year)
+        # print (instance.company)
+        # print (instance.ssr_code)
+        instance.ssr_code = '%s-CRM-%s00000' % ('A' if instance.company == 'LCMT' else 'B',year)
 
 # Container
 def pre_save_container_receiver(sender, instance, *args, **kwargs):
