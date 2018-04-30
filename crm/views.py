@@ -341,8 +341,29 @@ def BookingVip(request,slug):
 	from django.db.models import Avg,Min,Max
 	booking = get_object_or_404(Booking, slug=slug)
 	booking.perform_charge()
+	# Get ETB from Auto berth System
+	vessel_code =  booking.vessel.code
+	voy 		=  booking.voy
+	print('Get ETB from autoberth : %s - %s' % (vessel_code,voy))
+	etb = getETB(vessel_code,voy)
+	if etb != '':
+		booking.etb = etb
+		booking.save()
+	# print('Returned etb : %s' % etb)
+	# ------------------------------
 	print ('Re-cal VIP')
 	return redirect(reverse_lazy('crm:booking-detail', kwargs={'slug': slug}))
+
+def getETB(vessel_code,voy):
+	import urllib3
+	http = urllib3.PoolManager()
+	url = 'http://192.168.10.20:8003/berth/etb/%s/%s/' % (vessel_code,voy)
+	r = http.request('GET',url )
+	if r.status == 200:
+		return r.data.decode("utf-8")
+	else:
+		return ''
+
 
 def BookingSendApprove(request,slug):
 	if not request.user.is_authenticated:

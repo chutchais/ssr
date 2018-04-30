@@ -31,7 +31,7 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = ('__str__','ssr_code','company','voy','line','agent','customer','vessel','vip')
     # list_editable = ('color','move_performa')
     fieldsets = [
-        ('Basic Information',{'fields': ['name','ssr_code','company']}),
+        ('Basic Information',{'fields': ['name','ssr_code','company','cancel_invoice']}),
         ]
 admin.site.register(Booking,BookingAdmin)
 

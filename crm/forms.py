@@ -12,7 +12,7 @@ class BookingInvoiceForm(ModelForm):
 class BookingForm(ModelForm):
 	class Meta:
 		model = Booking
-		fields = ['ssr_code','remark','draft']
+		fields = ['ssr_code','remark','cancel_invoice','draft']
 
 	# def __init__(self, *args, **kwargs):
 	# 	super(BookingForm, self).__init__(*args, **kwargs)

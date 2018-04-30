@@ -1,28 +1,40 @@
-					
-				
-						<h3>{{ object.company}} Booking : {{ object.name}} 
 
-							--SSR Code : 
-							{% if perms.crm.can_modify_ssr %}
-								<a href="{% url 'crm:booking-update' object.slug %}">
-									{{ object.ssr_code }}
-								</a>
-							{% else %}
-								{{ object.ssr_code }}
-							{% endif %}
-							<br>
+						
+						<div class="row">
+							<div>
+								<h2>{{ object.company}} </h2>
+								<hr>
+							</div>
+							<div class="col-xs-6 col-sm-6">
+								<h3>
+									Booking/BL number : {{ object.name}}<br>
+									Invoice :
+									{% if perms.crm.can_modify_invoice %}
+										<a href="{% url 'crm:booking-invoice' object.slug %}">
+											{{ object.invoice|default_if_none:"[Not Assigned]" }}
+										</a>
+									{% else %}
+										{{ object.invoice|default_if_none:"[Not Assigned]" }}
+									{% endif %}
+								 </h3>
+							</div>
 
-							Invoice : 
+							<div class="col-xs-6 col-sm-6">
+								<h3>
+									SSR Code : 
+									{% if perms.crm.can_modify_ssr %}
+										<a href="{% url 'crm:booking-update' object.slug %}">
+											{{ object.ssr_code }}
+										</a>
+									{% else %}
+										{{ object.ssr_code }}
+									{% endif %}
+									<br>
 
-							
-							{% if perms.crm.can_modify_invoice %}
-								<a href="{% url 'crm:booking-invoice' object.slug %}">
-									{{ object.invoice|default_if_none:"[Not Assigned]" }}
-								</a>
-							{% else %}
-								{{ object.invoice|default_if_none:"[Not Assigned]" }}
-							{% endif %}
-						</h3>
+								</h3>
+							</div>
+
+						</div>
 						
 
 						{% if perms.crm.can_modify_vip %}
@@ -37,22 +49,27 @@
 								<table class="table table-hover">
 									<tr class="success">
 										<th>Vessel</th>
+										<th>Code</th>
 										<th>Voy</th>
 										<th>Line</th>
 										<th>Agent</th>
 									</tr>
 									<tr >
 										<td>{{object.vessel}}</td>
+										<td>{{object.vessel.code }}</td>
 										<td>{{object.voy}}</td>
 										<td>{{object.line}}</td>
 										<td>{{object.agent}}</td>
 									</tr>
+									<tr >
+										<td colspan="5">ETB : <i> {{object.etb}} </i></td>
+									</tr>
 									<tr class="success">
-										<th colspan="2">Bill to</th>
+										<th colspan="3">Bill to</th>
 										<th colspan="2">Customer</th>
 									</tr>
 									<tr>
-										<td colspan="2">{{object.billed_to}}</td>
+										<td colspan="3">{{object.billed_to}}</td>
 										<td colspan="2">{{object.customer}}</td>
 									</tr>
 								</table>
@@ -66,7 +83,7 @@
 									</tr>
 									{% if object.vip %}
 									<tr><td>No back charge: <b>{{ object.vip.no_back_charge }}</b></td>
-										<td>Storage fee: <b>{{ object.vip.storage }}</b></td>
+										<td>Storage free: <b>{{ object.vip.storage }}</b></td>
 									</tr>
 									<tr><td>Lift-On: <b>{{ object.vip.lifton }}</b></td>
 										<td>Re-Location: <b>{{ object.vip.reloc }}</b></td>
@@ -147,6 +164,18 @@
 							</table>
 							{% endif %}
 
+							{% if object.cancel_invoice %}
+								<h3>Cancel Invoice</h3>
+								<table class="table table-bordered">
+									<tr>
+										<th class="col-md-1">Invoice list</th>							
+									</tr>
+									<tr>
+										<td>{{object.cancel_invoice}}</td>
+									</tr>
+								</table>
+							{% endif %}
+
 
 							<h3>Container Details</h3>
 							<table class="table table-bordered">
@@ -191,7 +220,7 @@
 								</tr>
 								{% endfor %}
 							</table>
-
+							<b>Remarks :</b> Approved free time 3 days
 							
 						</div>
 				

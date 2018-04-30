@@ -137,7 +137,11 @@ class Booking(models.Model):
 	approve_date	= models.DateTimeField(blank=True, null=True)
 	received		= models.BooleanField(default=False)
 	receive_date	= models.DateTimeField(blank=True, null=True)
-	invoice         = models.CharField(max_length=30,blank=True, null=True) 
+	invoice         = models.CharField(max_length=30,blank=True, null=True)
+	etb				= models.DateTimeField(blank=True, null=True)
+	cancel_invoice	= models.CharField(max_length=255,blank=True, null=True)
+	do_file_name	= models.FileField(verbose_name ='Delivery File',
+							blank=True, null=True,upload_to='delivery/%Y/%m/%d/')
 
 	class Meta:
 		permissions = [('can_send_approve','Can send for approval'),
