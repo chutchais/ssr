@@ -176,6 +176,15 @@ class Booking(models.Model):
 				c.update_charge()
 				c.save()
 
+				# Get ETB from Auto berth System
+		vessel_code =  first_container.booking.vessel.code
+		voy 		=  first_container.booking.voy
+		print('Get ETB from autoberth(on update charge) : %s : %s - %s' % (self.name,vessel_code,voy))
+		etb = getETB(vessel_code,voy)
+		if etb != '':
+			self.etb 	= etb
+			self.save()
+
 		pass
 
 	def clear_vip(self):
@@ -305,6 +314,8 @@ class Container(models.Model):
 		self.rate3 = self.get_charge()[3]
 		self.lifton = self.get_charge()[4]
 		self.reloc = self.get_charge()[5]
+
+
 		# if self.booking.vip:
 		# 	if self.dwell > self.booking.vip.storage:
 		# 		self.charge = self.booking.vip.storage-self.dwell
@@ -312,6 +323,16 @@ class Container(models.Model):
 		# 	if (self.dwell <= self.booking.vip.storage) and (self.dwell> self.booking.vip.no_back_charge):
 		# 		self.charge =  self.dwell - self.booking.vip.no_back_charge
 		# pass
+
+def getETB(vessel_code,voy):
+	import urllib3
+	http = urllib3.PoolManager()
+	url = 'http://192.168.10.20:8003/berth/etb/%s/%s/' % (vessel_code,voy)
+	r = http.request('GET',url )
+	if r.status == 200:
+		return r.data.decode("utf-8")
+	else:
+		return ''
 
 class Charge(models.Model):
 	name 			= models.CharField(unique=True,verbose_name ='Charge name',max_length=100)
