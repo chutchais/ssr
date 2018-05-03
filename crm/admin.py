@@ -21,8 +21,19 @@ admin.site.register(Charge)
 admin.site.register(Container)
 admin.site.register(Customer)
 admin.site.register(Line)
-admin.site.register(Vessel)
+# admin.site.register(Vessel)
 # admin.site.register(Vip)
+
+class VesselAdmin(admin.ModelAdmin):
+    search_fields = ['name','code']
+    list_filter = []
+    list_display = ('__str__','code','description','created_date')
+    # list_editable = ('color','move_performa')
+    readonly_fields=('created_date',)
+    fieldsets = [
+        ('Basic Information',{'fields': ['name','code','description','created_date']}),
+        ]
+admin.site.register(Vessel,VesselAdmin)
 
 
 class BookingAdmin(admin.ModelAdmin):
