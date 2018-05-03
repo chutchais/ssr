@@ -5,7 +5,7 @@
 {% endblock head %}
 
 {% block title %}
-    Booking List
+    Wait approve
 {% endblock %}
 
 {% block style %}
@@ -25,16 +25,35 @@
 {% block content %}
 <div class="container">
 	<div class="row">
-				<h3>Booking List </h3>
+		<h3>Approved Report</h3>
 
-					<form class='form' method='GET' action='.'>
-						<input type='text' id='search' placeholder="Search booking,voy,line,vessel,customer" name="q" value='{{ request.GET.q}}'>
-						<button class='btn btn-default' type='submit'>Search</button>
-						<a href="{% url 'crm:booking-list'  %}">Clear result</a>
-					</form>
-					
-				{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
-				<table class="table table-bordered">
+  		<div class="col-sm-12 input-daterange input-group" id="datepicker">
+			<form class="form-inline">
+					  <label for="exampleInputName2">Select date :</label>
+					  <div class="form-group">
+					    <!-- <label for="exampleInputName2">From :</label> -->
+					    <input type="text" class="input-sm form-control" name="from" placeholder="{{request.GET.from}}"/>
+					  </div>
+
+					  <div class="form-group">
+					    <!-- <label for="exampleInputEmail2">To</label> -->
+					    <input type="text" class="input-sm form-control" name="to" placeholder="{{request.GET.to}}"/>
+					  </div>
+
+					  <div class="checkbox">
+					    <select class="form-control" name="terminal">
+						  <option>LCB</option>
+						  <option>LCMT</option>
+						</select>
+					  </div>
+					  <button type="submit" class="btn btn-primary">Show Report</button>
+					  <!-- <button type="submit" class="btn btn-primary">Clear</button> -->
+				 
+			</form>
+		</div>
+
+		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
+		<table class="table table-bordered">
 					<tr>
 						<th>Name</th>
 						<th>SSR#</th>
@@ -115,7 +134,7 @@
 				{% if is_paginated %}
 				  <ul class="pagination">
 				    {% if page_obj.has_previous %}
-				      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+				      <li><a href="?page={{ page_obj.previous_page_number }} 	&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&laquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&laquo;</span></li>
 				    {% endif %}
@@ -123,19 +142,53 @@
 				      {% if page_obj.number == i %}
 				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
 				      {% else %}
-				        <li><a href="?page={{ i }}">{{ i }}</a></li>
+				        <li><a href="?page={{ i }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">{{ i }}</a></li>
 				      {% endif %}
 				    {% endfor %}
 				    {% if page_obj.has_next %}
-				      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+				      <li><a href="?page={{ page_obj.next_page_number }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&raquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&raquo;</span></li>
 				    {% endif %}
 				  </ul>
 				{% endif %}
 
-	<hr/>
+
 
 	</div>
 </div>
 {% endblock content %}
+
+
+{% block java_content %}
+<script>
+ 
+ $(function(){
+$('.input-daterange').datepicker({
+    autoclose: true,
+    format:'yyyy-m-d'
+});
+});
+
+  // $('select option[value="1"]').attr("selected",true);
+
+$(document).ready(function(){
+     // $('#year option[value="2018"]').prop('selected',true);
+     // $('year option[value="2018"]').attr("selected",true);
+     // console.log($('year').val());
+     $('#year').val({{year}});
+     $('#month').val({{month}});
+    // $("h3").click(function(){
+        
+    //     alert("The paragraph was clicked.");
+    // });
+
+    $('#startDate input').datepicker({
+      format:'YYYY-MM-DD',
+      todayBtn: true,
+      todayHighlight: true
+    });
+
+});
+</script>
+{% endblock java_content %}

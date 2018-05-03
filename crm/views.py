@@ -204,15 +204,15 @@ def BookingFileProcess(request,slug):
 
 class BookingFileListView(LoginRequiredMixin,ListView):
 	model = BookingFile
-	paginate_by = 30
+	paginate_by = 100
 	template_name = 'bookingfile_list.html'
 	
 
 	def get_queryset(self):
 		query = self.request.GET.get('q')
 		if query :
-			return BookingFile.objects.filter(name__icontains=query)
-		return BookingFile.objects.all()
+			return BookingFile.objects.filter(name__icontains=query).order_by('-created_date')
+		return BookingFile.objects.all().order_by('-created_date')
 
 	# form_class=PersonSearchForm
 
@@ -304,10 +304,43 @@ class BookingFileCreateView(PermissionRequiredMixin,LoginRequiredMixin,CreateVie
 		return context
 
 
+# Report
+class BookingWaitingApproveListView(LoginRequiredMixin,ListView):
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_waiting_approve.html'
+
+	def get_queryset(self):
+		_from 		= self.request.GET.get('from')
+		_to 		= self.request.GET.get('to')
+		_terminal 	= self.request.GET.get('terminal')
+		if _from :
+			return Booking.objects.filter(Q(company__name = _terminal)&
+				Q(created_date__range=[_from,_to])&
+				Q(draft = False)&Q(approved=False)).order_by('-id')
+		return Booking.objects.none()
+
+class BookingApprovedListView(LoginRequiredMixin,ListView):
+	print('approved')
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_approved.html'
+
+	def get_queryset(self):
+		_from 		= self.request.GET.get('from')
+		_to 		= self.request.GET.get('to')
+		_terminal 	= self.request.GET.get('terminal')
+		if _from :
+			return Booking.objects.filter(Q(company__name = _terminal)&
+				Q(created_date__range=[_from,_to])&
+				Q(approved=True)).order_by('-id')
+		return Booking.objects.none()
+
+
 # Booking Details
 class BookingListView(LoginRequiredMixin,ListView):
 	model = Booking
-	paginate_by = 30
+	paginate_by = 100
 	template_name = 'booking_list.html'
 
 	def get_queryset(self):

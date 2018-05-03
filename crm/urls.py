@@ -16,17 +16,18 @@ from .views import (BookingFileListView,
 					ExtraChargeDeleteView,
 					BookingUpdateView,
 					BookingSendApprove,
-					BookingInvoiceUpdateView)
+					BookingInvoiceUpdateView,
+					BookingWaitingApproveListView,
+					BookingApprovedListView)
 
 urlpatterns = [ 
 	url(r'^$',BookingListView.as_view(),name='home'),
-	# url(r'create/$',BookingFileCreateView.as_view(),name='create'),
-	# url(r'(?P<slug>[-\w]+)/process$', BookingFileProcess, name='process'),
-	# url(r'(?P<slug>[-\w]+)/delete$', BookingFileDelete, name='delete'),
-	# url(r'(?^P<slug>[-\w]+)/vip$', BookingFileVip, name='vip'),
-	# url(r'(?P<slug>[-\w]+)/$', BookingFileDetailView.as_view(), name='detail'),
+
 	url(r'^extra/(?P<slug>[-\w]+)/$',ExtraChargeUpdateView.as_view(),name='extra-edit'),
 	url(r'^extra/(?P<slug>[-\w]+)/delete$',ExtraChargeDeleteView.as_view(),name='extra-delete'),
+
+	
+
 
 	url(r'^booking/$', BookingListView.as_view(),name='booking-list'),
 	url(r'^booking/(?P<slug>[-\w]+)/$', BookingDetailView.as_view(), name='booking-detail'),
@@ -43,6 +44,11 @@ urlpatterns = [
 	url(r'^file/(?P<slug>[-\w]+)/delete$', BookingFileDelete, name='delete'),
 	url(r'^file/(?P<slug>[-\w]+)/vip$', BookingFileVip, name='vip'),
 	url(r'^file/(?P<slug>[-\w]+)/$', BookingFileDetailView.as_view(), name='detail'),
+
+	# Report
+	url(r'^report/approved$', BookingApprovedListView.as_view(),name='report-approved'),
+	url(r'^report/wait$', BookingWaitingApproveListView.as_view(),name='report-waiting'),
+	
 	
 ]
 

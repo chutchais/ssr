@@ -25,6 +25,7 @@
 						<a href="{% url 'crm:list'  %}">Clear result</a>
 					</form>
 
+				{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
 				<table class="table table-bordered">
 					<tr>
 						<th>File name</th>

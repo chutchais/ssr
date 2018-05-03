@@ -26,12 +26,16 @@ admin.site.register(Vessel)
 
 
 class BookingAdmin(admin.ModelAdmin):
-    search_fields = ['name','ssr_code','company','voy','line','agent','customer','vessel']
+    search_fields = ['name','ssr_code','company__name','voy','line__name','agent__name','customer__name','vessel__name']
     list_filter = ['line','agent','customer','vessel']
-    list_display = ('__str__','ssr_code','company','voy','line','agent','customer','vessel','vip')
+    list_display = ('__str__','ssr_code','company','voy','line','agent','customer','vessel','vip','draft')
     # list_editable = ('color','move_performa')
+    readonly_fields=('created_date',)
     fieldsets = [
-        ('Basic Information',{'fields': ['name','ssr_code','company','cancel_invoice']}),
+        ('Basic Information',{'fields': ['name','ssr_code','company','invoice',
+            'cancel_invoice','created_date','draft']}),
+        ('Approval',{'fields': ['approved','approve_date']}),
+        ('Receive',{'fields': ['received','receive_date']}),
         ]
 admin.site.register(Booking,BookingAdmin)
 
