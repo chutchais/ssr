@@ -18,11 +18,27 @@ admin.site.register(Agent)
 admin.site.register(BookingFile)
 admin.site.register(BillTo)
 admin.site.register(Charge)
-admin.site.register(Container)
+# admin.site.register(Container)
 admin.site.register(Customer)
 admin.site.register(Line)
-# admin.site.register(Vessel)
-# admin.site.register(Vip)
+
+
+
+class ContainerAdmin(admin.ModelAdmin):
+    search_fields = ['number','booking__name']
+    list_filter = []
+    list_display = ('__str__','booking')
+    # list_editable = ('color','move_performa')
+    readonly_fields=('created_date','in_date','out_date','dwell',
+                    'charge','rate1','rate2','rate3','lifton','reloc')
+    fieldsets = [
+        ('Basic Information',{'fields': ['number','booking','created_date']}),
+        ('Container Info',{'fields': ['iso','container_type','container_size','container_high']}),
+        ('Yard detail',{'fields': [('in_date','out_date'),'dwell']}),
+        ('Charges detail',{'fields': ['charge',('rate1','rate2','rate3'),('lifton','reloc')]}),
+        ]
+
+admin.site.register(Container,ContainerAdmin)
 
 class VesselAdmin(admin.ModelAdmin):
     search_fields = ['name','code']
