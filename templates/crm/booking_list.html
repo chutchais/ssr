@@ -25,7 +25,7 @@
 {% block content %}
 <div class="container">
 	<div class="row">
-				<h3>Booking List </h3>
+				<h3>Search Booking List </h3>
 
 					<form class='form' method='GET' action='.'>
 						<input type='text' id='search' placeholder="Search booking,voy,line,vessel,customer" name="q" value='{{ request.GET.q}}'>
@@ -99,7 +99,21 @@
 							 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
 							 			Send to Approve
 							 		</a>
+
 							 	{% endif %}
+							{% else %}
+								{% if b.draft == False and b.approved == False %}
+									Waiting Approve
+								{% endif %}
+
+								{% if b.draft == False and b.approved %}
+									Approved
+								{% endif %}
+
+								{% if b.approved and b.received %}
+									Acct Received
+								{% endif %}
+
 					 		{% endif %}
 					 	</td>
 

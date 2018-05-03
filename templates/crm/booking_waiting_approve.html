@@ -42,7 +42,7 @@
 
 					  <div class="checkbox">
 					    <select class="form-control" name="terminal">
-						  <option>LCB</option>
+						  <option>LCB1</option>
 						  <option>LCMT</option>
 						</select>
 					  </div>
@@ -113,10 +113,10 @@
 					 	<td><span class="text-nowrap">{{ b.created_date|date:"d/m H:i" }}</span></td>
 
 					 	<td>
-					 		{% if b.draft %}
+					 		{% if b.draft == False and b.approved == False %}
 					 			{% if perms.crm.can_send_approve %}
-							 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
-							 			Send to Approve
+							 		<a href="{% url 'crm:booking-approve' b.slug %}">
+							 			Approve
 							 		</a>
 							 	{% endif %}
 					 		{% endif %}

@@ -332,13 +332,33 @@ class BookingApprovedListView(LoginRequiredMixin,ListView):
 		_terminal 	= self.request.GET.get('terminal')
 		if _from :
 			return Booking.objects.filter(Q(company__name = _terminal)&
-				Q(created_date__range=[_from,_to])&
-				Q(approved=True)).order_by('-id')
+				Q(approve_date__range=[_from,_to])&
+				Q(approved=True)).order_by('approve_date')
 		return Booking.objects.none()
 
 
 # Booking Details
 class BookingListView(LoginRequiredMixin,ListView):
+	print('draft')
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_draft.html'
+
+	def get_queryset(self):
+		query = self.request.GET.get('q')
+		if query :
+			return Booking.objects.filter((Q(name__icontains=query)|
+				Q(ssr_code__icontains=query)|
+				Q(voy__icontains=query)|
+				Q(line__name__icontains=query)|
+				Q(vessel__name__icontains=query)|
+				Q(company__name__icontains=query)|
+				Q(customer__name__icontains=query)|
+				Q(invoice__icontains=query))&
+				Q(draft=True)).order_by('-id')
+		return Booking.objects.filter(draft=True).order_by('created_date')
+
+class BookingSearchView(LoginRequiredMixin,ListView):
 	model = Booking
 	paginate_by = 100
 	template_name = 'booking_list.html'
@@ -354,7 +374,7 @@ class BookingListView(LoginRequiredMixin,ListView):
 				Q(company__name__icontains=query)|
 				Q(customer__name__icontains=query)|
 				Q(invoice__icontains=query)).order_by('-id')
-		return Booking.objects.all().order_by('-id')
+		return Booking.objects.none()
 
 class BookingDetailView(LoginRequiredMixin,DetailView):
 	model = Booking
@@ -408,6 +428,22 @@ def BookingSendApprove(request,slug):
 	from django.db.models import Avg,Min,Max
 	booking = get_object_or_404(Booking, slug=slug)
 	booking.draft=False
+	booking.save()
+
+	return redirect(reverse_lazy( 'crm:booking-list'))
+
+def BookingApprove(request,slug): 
+	from datetime import datetime
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	if not request.user.has_perm('crm.can_approve'):
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	from django.db.models import Avg,Min,Max
+	booking = get_object_or_404(Booking, slug=slug)
+	booking.approved = True
+	booking.approve_date = datetime.now()
 	booking.save()
 
 	return redirect(reverse_lazy( 'crm:booking-list'))

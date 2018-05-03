@@ -9,6 +9,7 @@ from .views import (BookingFileListView,
 					BookingFileVip,
 					BookingFileDelete,
 					BookingListView,
+					BookingSearchView,
 					BookingDetailView,
 					BookingVip,BookingResetVip,
 					ExtraChargeCreateView,
@@ -16,6 +17,7 @@ from .views import (BookingFileListView,
 					ExtraChargeDeleteView,
 					BookingUpdateView,
 					BookingSendApprove,
+					BookingApprove,
 					BookingInvoiceUpdateView,
 					BookingWaitingApproveListView,
 					BookingApprovedListView)
@@ -30,6 +32,7 @@ urlpatterns = [
 
 
 	url(r'^booking/$', BookingListView.as_view(),name='booking-list'),
+	url(r'^booking/search/$', BookingSearchView.as_view(),name='booking-search'),
 	url(r'^booking/(?P<slug>[-\w]+)/$', BookingDetailView.as_view(), name='booking-detail'),
 	url(r'^booking/(?P<slug>[-\w]+)/invoice/$', BookingInvoiceUpdateView.as_view(), name='booking-invoice'),
 	url(r'^booking/(?P<slug>[-\w]+)/update/$', BookingUpdateView.as_view(), name='booking-update'),
@@ -37,6 +40,7 @@ urlpatterns = [
 	url(r'^booking/(?P<slug>[-\w]+)/vip$', BookingVip, name='booking-vip'),
 	url(r'^booking/(?P<slug>[-\w]+)/reset-vip$', BookingResetVip, name='booking-resetvip'),
 	url(r'^booking/(?P<slug>[-\w]+)/send-approve$', BookingSendApprove, name='booking-send-approve'),
+	url(r'^booking/(?P<slug>[-\w]+)/approve$', BookingApprove, name='booking-approve'),
 
 	url(r'^file/$', BookingFileListView.as_view(),name='list'),
 	url(r'^file/create/$',BookingFileCreateView.as_view(),name='create'),
