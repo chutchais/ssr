@@ -311,14 +311,15 @@ class BookingWaitingApproveListView(LoginRequiredMixin,ListView):
 	template_name = 'crm/booking_waiting_approve.html'
 
 	def get_queryset(self):
-		_from 		= self.request.GET.get('from')
-		_to 		= self.request.GET.get('to')
+		# _from 		= self.request.GET.get('from')
+		# _to 		= self.request.GET.get('to'
 		_terminal 	= self.request.GET.get('terminal')
-		if _from :
+		print(_terminal)
+		if _terminal :
 			return Booking.objects.filter(Q(company__name = _terminal)&
-				Q(created_date__range=[_from,_to])&
-				Q(draft = False)&Q(approved=False)).order_by('-id')
-		return Booking.objects.none()
+				Q(draft = False)&
+				Q(approved=False)).order_by('created_date')
+		return Booking.objects.none() #filter(draft = False,approved=False).order_by('created_date')
 
 class BookingApprovedListView(LoginRequiredMixin,ListView):
 	print('approved')
@@ -355,7 +356,7 @@ class BookingListView(LoginRequiredMixin,ListView):
 				Q(company__name__icontains=query)|
 				Q(customer__name__icontains=query)|
 				Q(invoice__icontains=query))&
-				Q(draft=True)).order_by('-id')
+				Q(draft=True)).order_by('created_date')
 		return Booking.objects.filter(draft=True).order_by('created_date')
 
 class BookingSearchView(LoginRequiredMixin,ListView):
@@ -446,7 +447,7 @@ def BookingApprove(request,slug):
 	booking.approve_date = datetime.now()
 	booking.save()
 
-	return redirect(reverse_lazy( 'crm:booking-list'))
+	return redirect('%s?terminal=%s' % (reverse_lazy( 'crm:report-waiting'),booking.company))
 
 def BookingResetVip(request,slug):
 	if not request.user.is_authenticated:

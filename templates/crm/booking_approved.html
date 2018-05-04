@@ -110,15 +110,11 @@
 					 		{% endif %}
 
 					 	</td>
-					 	<td><span class="text-nowrap">{{ b.approve_date|date:"d/m H:i" }}</span></td>
+					 	<td><span class="text-nowrap">{{ b.approve_date|date:"d/m/y H:i" }}</span></td>
 
 					 	<td>
-					 		{% if b.draft %}
-					 			{% if perms.crm.can_send_approve %}
-							 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
-							 			Send to Approve
-							 		</a>
-							 	{% endif %}
+					 		{% if b.approved %}
+					 			Approved
 					 		{% endif %}
 					 	</td>
 

@@ -447,14 +447,17 @@ def pre_save_billto_receiver(sender, instance, *args, **kwargs):
 
 # Booking
 def pre_save_booking_receiver(sender, instance, *args, **kwargs):
+    # print (instance.company,instance.company.name)
+    # print ('A' if instance.company.name == 'LCMT' else 'B')
+    # print (instance.ssr_code)
     if not instance.slug:
         instance.slug = create_slug(Booking,instance)
     if not instance.ssr_code:
         from datetime import datetime
         year = datetime.strftime(datetime.now(),'%y')
-        # print (instance.company)
+        # print (instance.company.name)
         # print (instance.ssr_code)
-        instance.ssr_code = '%s-CRM-%s00000' % ('A' if instance.company == 'LCMT' else 'B',year)
+        # instance.ssr_code = '%s-CRM-%s00000' % ('A' if instance.company.name == 'LCMT' else 'B',year)
 
 # Container
 def pre_save_container_receiver(sender, instance, *args, **kwargs):

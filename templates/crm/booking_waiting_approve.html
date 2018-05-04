@@ -27,18 +27,18 @@
 	<div class="row">
 		<h3>Waiting for Approve Report</h3>
 
-  		<div class="col-sm-12 input-daterange input-group" id="datepicker">
+  		<!-- <div class="col-sm-12 input-daterange input-group" id="datepicker"> -->
 			<form class="form-inline">
-					  <label for="exampleInputName2">Select date :</label>
+					<!--   <label for="exampleInputName2">Select date :</label>
 					  <div class="form-group">
-					    <!-- <label for="exampleInputName2">From :</label> -->
+
 					    <input type="text" class="input-sm form-control" name="from" placeholder="{{request.GET.from}}"/>
 					  </div>
 
 					  <div class="form-group">
-					    <!-- <label for="exampleInputEmail2">To</label> -->
+
 					    <input type="text" class="input-sm form-control" name="to" placeholder="{{request.GET.to}}"/>
-					  </div>
+					  </div> -->
 
 					  <div class="checkbox">
 					    <select class="form-control" name="terminal">
@@ -50,7 +50,7 @@
 					  <!-- <button type="submit" class="btn btn-primary">Clear</button> -->
 				 
 			</form>
-		</div>
+		<!-- </div> -->
 
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
 		<table class="table table-bordered">
@@ -110,12 +110,12 @@
 					 		{% endif %}
 
 					 	</td>
-					 	<td><span class="text-nowrap">{{ b.created_date|date:"d/m H:i" }}</span></td>
+					 	<td><span class="text-nowrap">{{ b.created_date|date:"d/m/y H:i" }}</span></td>
 
 					 	<td>
 					 		{% if b.draft == False and b.approved == False %}
 					 			{% if perms.crm.can_send_approve %}
-							 		<a href="{% url 'crm:booking-approve' b.slug %}">
+							 		<a href="{% url 'crm:booking-approve' b.slug %}?terminal={{request.GET.terminal}}">
 							 			Approve
 							 		</a>
 							 	{% endif %}
@@ -134,7 +134,7 @@
 				{% if is_paginated %}
 				  <ul class="pagination">
 				    {% if page_obj.has_previous %}
-				      <li><a href="?page={{ page_obj.previous_page_number }} 	&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&laquo;</a></li>
+				      <li><a href="?page={{ page_obj.previous_page_number }}&terminal={{request.GET.terminal}}">&laquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&laquo;</span></li>
 				    {% endif %}
@@ -142,11 +142,11 @@
 				      {% if page_obj.number == i %}
 				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
 				      {% else %}
-				        <li><a href="?page={{ i }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">{{ i }}</a></li>
+				        <li><a href="?page={{ i }}&terminal={{request.GET.terminal}}">{{ i }}</a></li>
 				      {% endif %}
 				    {% endfor %}
 				    {% if page_obj.has_next %}
-				      <li><a href="?page={{ page_obj.next_page_number }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&raquo;</a></li>
+				      <li><a href="?page={{ page_obj.next_page_number }}&terminal={{request.GET.terminal}}">&raquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&raquo;</span></li>
 				    {% endif %}
