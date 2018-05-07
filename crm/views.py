@@ -20,6 +20,7 @@ from django.urls import reverse_lazy,reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.views.generic.edit import FormMixin
+from django.db.models import Count,Sum,Value,Min,Max, When,Case,IntegerField,CharField
 
 from .forms import BookingFileForm,ExtraChargeFileForm,BookingForm,BookingInvoiceForm
 from .models import (Agent,
@@ -126,10 +127,10 @@ def BookingFileProcess(request,slug):
 	vOut =''
 	vDWell =''
 	from datetime import datetime
-
+	print ('Start looping Container')
 	for row_index in range(0, xl_sheet.nrows):
 		vContainer = xl_sheet.cell(row_index, col_cont_ix).value.__str__().strip()
-
+		# print(vContainer)
 		if (vContainer !='' and re.match(regex,vContainer)) :
 			vVessel=	xl_sheet.cell(row_index, 0).value.__str__().strip()
 			vVoy=		xl_sheet.cell(row_index, 3).value.__str__().strip()
@@ -321,8 +322,80 @@ class BookingWaitingApproveListView(LoginRequiredMixin,ListView):
 				Q(approved=False)).order_by('created_date')
 		return Booking.objects.none() #filter(draft = False,approved=False).order_by('created_date')
 
+# Approved Booking Report
+def BookingApprovedSummary(request):
+	
+	_from		= 	request.GET.get('from')
+	_to 		= 	request.GET.get('to')
+	_terminal 	= 	request.GET.get('terminal','ALL')
+
+	from datetime import datetime, timedelta
+
+	if _from  and _to : 
+		objStartDate = datetime.strptime(_from, '%Y-%m-%d')
+		objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
+	else:
+		objStartDate = datetime.now()
+		objStopDate  =  objStartDate + timedelta(days=1)
+
+
+	# stop_date_1 = objStopDate.strftime('%Y-%m-%d')
+	if _terminal == 'ALL':
+		qs  		= 	Booking.objects.filter(
+							Q(approve_date__range=[objStartDate,objStopDate])&
+							Q(approved=True))
+		c_qs 		= Container.objects.filter(
+						booking__approve_date__range = [objStartDate,objStopDate],
+						booking__approved = True
+						)
+	else:	
+		qs  		= 	Booking.objects.filter(Q(company__name = _terminal)&
+						Q(approve_date__range=[objStartDate,objStopDate])&
+						Q(approved=True))
+		c_qs 		= Container.objects.filter(
+						booking__approve_date__range = [objStartDate,objStopDate],
+						booking__company__name = _terminal,
+						booking__approved = True
+						)
+	# Booking Summary
+	booking_by_line =	qs.values('company__name','line__name').annotate(
+							number=Count('name')
+							).order_by('company__name','line__name','-number')
+	container_by_line = c_qs.values('booking__company__name','booking__line__name').annotate(
+						number=Count('booking__name'))
+	# print(container_by_line)
+	# Container Summary
+	container_by_size = c_qs.values('booking__company__name','container_type','container_size').annotate(
+								number=Count('number'),
+								dwell_number=Sum('dwell'),
+								charge_number=Sum('charge'),
+								rate1_number = Sum('rate1'),
+								rate2_number = Sum('rate2'),
+								rate3_number = Sum('rate3'),
+								lifton_number = Sum('lifton'),
+								reloc_number = Sum('reloc')).order_by(
+								'booking__company__name','container_type','container_size')
+	# print (booking_by_line,container_by_size)
+
+	context ={
+			'booking_lists':booking_by_line,
+			'booking_container_list':container_by_line,
+			'container_lists': container_by_size,
+			'start_date' : objStartDate,
+			'stop_date':  objStopDate,
+			'terminal': _terminal
+	}
+	return render(request,
+			 'crm/approved_summary.html',
+			 context)
+
+
+def f(**kwargs):
+	# print(kwargs)
+	return kwargs
+
 class BookingApprovedListView(LoginRequiredMixin,ListView):
-	print('approved')
+	# print('approved')
 	model = Booking
 	paginate_by = 100
 	template_name = 'crm/booking_approved.html'
@@ -331,16 +404,79 @@ class BookingApprovedListView(LoginRequiredMixin,ListView):
 		_from 		= self.request.GET.get('from')
 		_to 		= self.request.GET.get('to')
 		_terminal 	= self.request.GET.get('terminal')
+		_line		= self.request.GET.get('line')
+
+		kwargs = {}
+		if _terminal:
+			kwargs ={
+					'company__name' : _terminal
+					}
+		if _line:
+			kwargs = f(line__name=_line, **kwargs)
+
 		if _from :
-			return Booking.objects.filter(Q(company__name = _terminal)&
-				Q(approve_date__range=[_from,_to])&
-				Q(approved=True)).order_by('approve_date')
+			from datetime import datetime, timedelta
+			objStartDate = datetime.strptime(_from, '%Y-%m-%d')
+			objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
+			# print (kwargs)
+			return Booking.objects.filter(**kwargs,
+					approve_date__range=[objStartDate,objStopDate],
+					approved=True).order_by('-ssr_code')
+
+
 		return Booking.objects.none()
+# End Approval booking report
+
+
+# Container list report
+class ContainerListView(LoginRequiredMixin,ListView):
+	model = Container
+	paginate_by = 100
+	# template_name = 'crm/container_listview.html'
+
+	def get_queryset(self):
+		_from 		= self.request.GET.get('from')
+		_to 		= self.request.GET.get('to')
+		_terminal 	= self.request.GET.get('terminal')
+		_line	 	= self.request.GET.get('line')
+		# _line	 	= 'ALL' if _line=='' else _line
+
+		kwargs = {}
+		if _terminal:
+			kwargs ={
+					'booking__company__name' : _terminal
+					}
+		if _line:
+			kwargs = f(booking__line__name=_line, **kwargs)
+
+		from datetime import datetime, timedelta
+		objStartDate = datetime.strptime(_from, '%Y-%m-%d')
+		objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
+
+		if _from :
+			return Container.objects.filter(**kwargs,
+					booking__approve_date__range=[objStartDate,objStopDate],
+					booking__approved = True
+					).order_by('booking__approve_date')
+			# if _line == 'ALL':
+			# 	return Container.objects.filter(Q(booking__company__name = _terminal)&
+			# 		Q(booking__approve_date__range=[objStartDate,objStopDate])&
+			# 		Q(booking__approved = True)
+			# 		).order_by('booking__approve_date')
+			# else:
+			# 	return Container.objects.filter(Q(booking__company__name = _terminal)&
+			# 		Q(booking__approve_date__range=[objStartDate,objStopDate])&
+			# 		Q(booking__approved = True)&
+			# 		Q(booking__line__name = _line)
+			# 		).order_by('booking__approve_date')
+
+		return Container.objects.none()
+# End Container list report
 
 
 # Booking Details
 class BookingListView(LoginRequiredMixin,ListView):
-	print('draft')
+	# print('draft')
 	model = Booking
 	paginate_by = 100
 	template_name = 'crm/booking_draft.html'

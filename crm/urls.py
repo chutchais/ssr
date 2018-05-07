@@ -20,7 +20,9 @@ from .views import (BookingFileListView,
 					BookingApprove,
 					BookingInvoiceUpdateView,
 					BookingWaitingApproveListView,
-					BookingApprovedListView)
+					BookingApprovedListView,
+					BookingApprovedSummary,
+					ContainerListView)
 
 urlpatterns = [ 
 	url(r'^$',BookingListView.as_view(),name='home'),
@@ -50,7 +52,9 @@ urlpatterns = [
 	url(r'^file/(?P<slug>[-\w]+)/$', BookingFileDetailView.as_view(), name='detail'),
 
 	# Report
-	url(r'^report/approved$', BookingApprovedListView.as_view(),name='report-approved'),
+	url(r'^report/approved/container$', ContainerListView.as_view(),name='report-approved-container'),
+	url(r'^report/approved/summary$', views.BookingApprovedSummary,name='report-approved-summary'),
+	url(r'^report/approved/booking$', BookingApprovedListView.as_view(),name='report-approved'),
 	url(r'^report/wait$', BookingWaitingApproveListView.as_view(),name='report-waiting'),
 	
 	

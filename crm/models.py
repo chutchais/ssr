@@ -154,7 +154,7 @@ class Booking(models.Model):
 		return self.name
 
 	def get_absolute_url(self):
-		return reverse('crm:detail', kwargs={'slug':self.slug})
+		return reverse('crm:booking-detail', kwargs={'slug':self.slug})
 
 	def charge_total(self):
 		return self.container_set.all().aggregate(Sum('charge'))['charge__sum']

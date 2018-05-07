@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Booking List
+{% endblock %}
+
+{% block style %}
+<style>
+	.table td.fit{
+	    white-space: nowrap;
+	    width: 1%;
+	}, 
+	.table th.fit {
+	    white-space: nowrap;
+	    width: 1%;
+	}
+</style>
+{% endblock style %}
+
+
+{% block content %}
+<div class="container">
+	<div class="row">
+		<h3>Container List</h3>
+		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
+				<table class="table table-bordered">
+					<tr>
+						<th>Number</th>
+						<th>Booking</th>
+						<th>Terminal</th>
+						<th>Type</th>
+						<th>Size</th>
+						<th>In</th>
+						<th>Out</th>
+						<th>dWell</th>
+						<th>Charge</th>
+						<th>Rate1</th>
+						<th>Rate2</th>
+						<th>Rate3</th>
+						<th>LiftOn</th>
+						<th>Re-Loc</th>
+				     </tr>
+
+					
+						{% for b in object_list %}
+						<tr>
+					 	<td nowrap>
+					 		{{ b.number }}
+					 	</td>
+					 	<td nowrap>
+					 		<a href="{{b.booking.get_absolute_url}}">
+					 				{{ b.booking }}
+					 		</a>
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.booking.company }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.container_type }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.container_size }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.in_date|date:"d/m H:i" }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.out_date|date:"d/m H:i" }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.dwell }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.charge }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.rate1 }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.rate2 }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.rate3 }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.lifton }}
+					 	</td>
+					 	<td nowrap>
+					 		{{ b.reloc }}
+					 	</td>
+					 	
+					 	
+
+					 	{% empty %}
+					 		<td>No list</td>
+					 	
+					 	
+					 	</tr>
+					 	{% endfor %}
+					 
+
+				</table>
+				{% if is_paginated %}
+				  <ul class="pagination">
+				    {% if page_obj.has_previous %}
+				      <li><a href="?page={{ page_obj.previous_page_number }} 	&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&laquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&laquo;</span></li>
+				    {% endif %}
+				    {% for i in paginator.page_range %}
+				      {% if page_obj.number == i %}
+				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+				      {% else %}
+				        <li><a href="?page={{ i }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">{{ i }}</a></li>
+				      {% endif %}
+				    {% endfor %}
+				    {% if page_obj.has_next %}
+				      <li><a href="?page={{ page_obj.next_page_number }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&raquo;</a></li>
+				    {% else %}
+				      <li class="disabled"><span>&raquo;</span></li>
+				    {% endif %}
+				  </ul>
+				{% endif %}
+		
+	</div>
+</div>
+{% endblock content %}
