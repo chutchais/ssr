@@ -142,13 +142,17 @@ class Booking(models.Model):
 	cancel_invoice	= models.CharField(max_length=255,blank=True, null=True)
 	do_file_name	= models.FileField(verbose_name ='Delivery File',
 							blank=True, null=True,upload_to='delivery/%Y/%m/%d/')
+	account_accepted= models.BooleanField(default=False)
+	accepted_date	= models.DateTimeField(blank=True, null=True)
+	account_comment	= models.TextField(blank=True,null=True)
 
 	class Meta:
 		permissions = [('can_send_approve','Can send for approval'),
 						('can_approve','Can approve booking'),
 						('can_modify_invoice','Can modify invoice'),
 						('can_modify_ssr','Can modify ssr number'),
-						('can_modify_vip','Can modify VIP')]
+						('can_modify_vip','Can modify VIP'),
+						('can_account_accept','Can account accept')]
 	
 	def __str__(self):
 		return self.name
@@ -202,6 +206,17 @@ class Booking(models.Model):
 
 	def get_summary(self):
 		summary = self.container_set.all().values('container_size').annotate(
+			total=Sum('dwell'),
+			rate1 =Sum('rate1'),
+			rate2 =Sum('rate2'),
+			rate3 =Sum('rate3'),
+			lifton =Sum('lifton'),
+			reloc =Sum('reloc')
+			)
+		return summary
+
+	def get_summary2(self):
+		summary = self.container_set.all().values('booking__name').annotate(
 			total=Sum('dwell'),
 			rate1 =Sum('rate1'),
 			rate2 =Sum('rate2'),

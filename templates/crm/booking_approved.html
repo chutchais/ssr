@@ -42,6 +42,7 @@
 
 					  <div class="checkbox">
 					    <select class="form-control" name="terminal">
+						  <option>ALL</option>
 						  <option>LCB1</option>
 						  <option>LCMT</option>
 						</select>
@@ -55,50 +56,72 @@
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
 		<table class="table table-bordered">
 					<tr>
-						<th>Name</th>
 						<th>SSR#</th>
-				        <th>Invoice#</th>
-				        <th></th>
+						<th>SSR Date</th>
 				        <th>Line</th>
-				        <!-- <th>Agent</th> -->
-				        <th>Vessel</th>
-				        <th>Voy</th>
+				        <th>BL#</th>
 				        <th>Customer</th>
-				        <th>#</th>
-				        <th>dWell</th>
-				        <th>Charge</th>
-				        <th>Vip</th>
-				        <th>Approve on</th>
-				        <th>Status</th>
+				        <th>7 day</th>
+				        <th>8-14 day</th>
+				        <th>more 15 day</th>
+				        <th>LiftOn</th>
+				        <th>ReLoc</th>
+				        <th>Invoice#</th>
+				        <th>Account Accept</th>
 				      </tr>
 
 					
 						{% for b in object_list %}
 						<tr>
-					 	<td nowrap>
-					 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
-					 	</td>
-					 	
-					 	{% if perms.crm.can_modify_ssr %}
-						 	<td nowrap><a href="{% url 'crm:booking-update' b.slug  %}?next=
-						 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
-					 	{% else %}
-					 		<td nowrap>{{ b.ssr_code }}</td>
-					 	{% endif %}
 
-					 	{% if perms.crm.can_modify_invoice %}
-						 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
-						 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"" }}</a></td>
-					 	{% else %}
-					 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
-					 	{% endif %}
+							{% if perms.crm.can_modify_ssr %}
+							 	<td nowrap><a href="{% url 'crm:booking-update' b.slug  %}?next=
+							 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
+						 	{% else %}
+						 		<td nowrap>{{ b.ssr_code }}</td>
+						 	{% endif %}
+						 	
+						 	<td nowrap>
+						 		{{ b.created_date|date:"d/m/y H:i" }}
+						 	</td>
+						 	<td>{{ b.line }}</td>
+						 	<td nowrap>
+						 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+						   </td>
+					 		<td><small>{{ b.customer }}</small></td>
 
-					 	<td>{{ b.company }}</td>
-					 	<td>{{ b.line }}</td>
-					 	<!-- <td>{{ b.agent }}</td> -->
+
+					 		{% for c in b.get_summary2 %}
+<!-- 									<tr>
+										<td class="text-center">{{c.container_size|floatformat:"0"}}</td>
+										<td class="text-center">{{c.total}}</td>
+										<td class="text-center">{{c.rate1}}</td>
+										<td class="text-center">{{c.rate2}}</td>
+										<td class="text-center">{{c.rate3}}</td>
+										<td class="text-center">{{c.lifton}}</td>
+										<td class="text-center">{{c.reloc}}</td>	
+									</tr> -->
+									<td>{{c.rate1}}</td>
+							 		<td>{{c.rate2}}</td>
+							 		<td>{{c.rate3}}</td>
+							 		<td>{{c.lifton}}</td>
+							 		<td>{{c.reloc}}</td>
+								{% endfor %}
+					 		
+
+							 	{% if perms.crm.can_modify_invoice %}
+								 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
+								 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"" }}</a></td>
+							 	{% else %}
+							 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
+							 	{% endif %}
+
+							 	<td></td>
+
+					 	<!-- <td>{{ b.company }}</td>
 					 	<td><span class="text-nowrap"><small>{{ b.vessel }}</small></span></td>
 					 	<td>{{ b.voy }}</td>
-					 	<td><small>{{ b.customer }}</small></td>
+					 	
 					 	<td>{{ b.container_set.count }}</td>
 					 	<td>{{ b.dwell_total }}</td>
 					 	<td>{{ b.charge_total }}</td>
@@ -116,7 +139,7 @@
 					 		{% if b.approved %}
 					 			Approved
 					 		{% endif %}
-					 	</td>
+					 	</td> -->
 
 					 	{% empty %}
 					 		<td>No list</td>

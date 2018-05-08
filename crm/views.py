@@ -406,6 +406,8 @@ class BookingApprovedListView(LoginRequiredMixin,ListView):
 		_terminal 	= self.request.GET.get('terminal')
 		_line		= self.request.GET.get('line')
 
+		_terminal	= None if _terminal =='ALL' else _terminal
+
 		kwargs = {}
 		if _terminal:
 			kwargs ={
