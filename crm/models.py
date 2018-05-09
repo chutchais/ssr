@@ -160,6 +160,7 @@ class Booking(models.Model):
 	def get_absolute_url(self):
 		return reverse('crm:booking-detail', kwargs={'slug':self.slug})
 
+	
 	def charge_total(self):
 		return self.container_set.all().aggregate(Sum('charge'))['charge__sum']
 

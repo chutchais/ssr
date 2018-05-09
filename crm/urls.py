@@ -22,7 +22,9 @@ from .views import (BookingFileListView,
 					BookingWaitingApproveListView,
 					BookingApprovedListView,
 					BookingApprovedSummary,
-					ContainerListView)
+					ContainerListView,BookingAccountAccept,
+					BookingNoInvoiceListView,
+					BookingNotAcceptListView)
 
 urlpatterns = [ 
 	url(r'^$',BookingListView.as_view(),name='home'),
@@ -43,6 +45,8 @@ urlpatterns = [
 	url(r'^booking/(?P<slug>[-\w]+)/reset-vip$', BookingResetVip, name='booking-resetvip'),
 	url(r'^booking/(?P<slug>[-\w]+)/send-approve$', BookingSendApprove, name='booking-send-approve'),
 	url(r'^booking/(?P<slug>[-\w]+)/approve$', BookingApprove, name='booking-approve'),
+	url(r'^booking/(?P<slug>[-\w]+)/account-accept$', BookingAccountAccept, name='booking-account-accept'),
+
 
 	url(r'^file/$', BookingFileListView.as_view(),name='list'),
 	url(r'^file/create/$',BookingFileCreateView.as_view(),name='create'),
@@ -56,6 +60,8 @@ urlpatterns = [
 	url(r'^report/approved/summary$', views.BookingApprovedSummary,name='report-approved-summary'),
 	url(r'^report/approved/booking$', BookingApprovedListView.as_view(),name='report-approved'),
 	url(r'^report/wait$', BookingWaitingApproveListView.as_view(),name='report-waiting'),
+	url(r'^report/noinvoice$',BookingNoInvoiceListView.as_view(),name='report-noinvoice'),
+	url(r'^report/notaccept$',BookingNotAcceptListView.as_view(),name='report-notaccept'),
 	
 	
 ]

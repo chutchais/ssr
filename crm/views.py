@@ -91,6 +91,7 @@ def BookingFileVip(request,slug):
 	return redirect(reverse_lazy( 'crm:detail', kwargs={'slug': slug}))
 
 def get_vip(line,customer,datein):
+
 	if not request.user.is_authenticated:
 		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
@@ -394,6 +395,22 @@ def f(**kwargs):
 	# print(kwargs)
 	return kwargs
 
+class BookingNotAcceptListView(LoginRequiredMixin,ListView):
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_notaccept.html'
+	def get_queryset(self):
+		return Booking.objects.filter(approved=True , 
+					account_accepted = False).order_by('-ssr_code')
+
+class BookingNoInvoiceListView(LoginRequiredMixin,ListView):
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_noinvoice.html'
+	def get_queryset(self):
+		return Booking.objects.filter(approved=True , 
+					invoice = None).order_by('-ssr_code')
+
 class BookingApprovedListView(LoginRequiredMixin,ListView):
 	# print('approved')
 	model = Booking
@@ -405,25 +422,45 @@ class BookingApprovedListView(LoginRequiredMixin,ListView):
 		_to 		= self.request.GET.get('to')
 		_terminal 	= self.request.GET.get('terminal')
 		_line		= self.request.GET.get('line')
+		_onlylifton  = self.request.GET.get('onlylifton')
+		_onlylifton	= True if _onlylifton == 'on' else False
 
 		_terminal	= None if _terminal =='ALL' else _terminal
 
 		kwargs = {}
+		kwargs_con ={}
 		if _terminal:
 			kwargs ={
 					'company__name' : _terminal
 					}
+			kwargs_con ={
+					'booking__company__name' : _terminal
+					}
+
 		if _line:
 			kwargs = f(line__name=_line, **kwargs)
+			kwargs_con  = f(booking__line__name=_line, **kwargs_con)
 
 		if _from :
 			from datetime import datetime, timedelta
 			objStartDate = datetime.strptime(_from, '%Y-%m-%d')
 			objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
 			# print (kwargs)
-			return Booking.objects.filter(**kwargs,
-					approve_date__range=[objStartDate,objStopDate],
-					approved=True).order_by('-ssr_code')
+
+			if _onlylifton:
+				c = Container.objects.filter( **kwargs_con,
+					booking__approve_date__range=[objStartDate,objStopDate],
+					booking__approved=True,
+					lifton =1
+					)
+				bookig_list = c.values('booking__name').annotate(number=Sum('lifton')).values_list('booking__name',flat=True)
+				return Booking.objects.filter(**kwargs,
+						approve_date__range=[objStartDate,objStopDate],
+						approved=True, name__in=bookig_list).order_by('-ssr_code')
+			else:
+				return Booking.objects.filter(**kwargs,
+						approve_date__range=[objStartDate,objStopDate],
+						approved=True).order_by('-ssr_code')
 
 
 		return Booking.objects.none()
@@ -570,6 +607,32 @@ def BookingSendApprove(request,slug):
 	booking.save()
 
 	return redirect(reverse_lazy( 'crm:booking-list'))
+
+def BookingAccountAccept(request,slug): 
+	from datetime import datetime
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	if not request.user.has_perm('crm.can_account_accept'):
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	from django.db.models import Avg,Min,Max
+	booking = get_object_or_404(Booking, slug=slug)
+	booking.account_accepted = True
+	booking.accepted_date = datetime.now()
+	booking.save()
+
+	# print ('Request from %s' %request.META.get('HTTP_REFERER', '/'))
+	request_page_url = request.META.get('HTTP_REFERER', '/')
+	_from = request.GET.get('from')
+	_to = request.GET.get('to')
+	_onlylifton = request.GET.get('onlylifton')
+	_terminal = request.GET.get('terminal')
+	_terminal = 'ALL' if _terminal=='' else _terminal
+
+	return redirect('%s?from=%s&to=%s&terminal=%s&onlylifton=%s' % 
+		(request_page_url,_from,_to,_terminal,_onlylifton))
+	# return redirect('%s?from=%s&to=%s&terminal=%s&onlylifton=%s' % (reverse_lazy( 'crm:report-approved'),_from,_to,_terminal,_onlylifton))
 
 def BookingApprove(request,slug): 
 	from datetime import datetime
@@ -723,8 +786,13 @@ class BookingInvoiceUpdateView(LoginRequiredMixin,UpdateView):
 	def get_success_url(self,*args, **kwargs):
 		slug = self.kwargs.get('slug')
 		# Original
-		# url = reverse('crm:booking-detail',kwargs={'slug':slug})
-		url = reverse('crm:booking-list')
+		url =  reverse('crm:booking-detail',kwargs={'slug':slug})
+		next = self.request.GET.get('next')
+		if next == 'noinvoice':
+			url = reverse('crm:report-noinvoice')
+		if next == 'accountaccept':
+			url = reverse('crm:report-notaccept')
+		# print('Request from : %s' % self.request.path)
 		return url
 		# return url
 

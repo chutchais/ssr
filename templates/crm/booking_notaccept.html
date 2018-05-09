@@ -5,7 +5,7 @@
 {% endblock head %}
 
 {% block title %}
-   Approved Report
+    Pending Account Accept
 {% endblock %}
 
 {% block style %}
@@ -25,42 +25,10 @@
 {% block content %}
 <div class="container">
 	<div class="row">
-		<h3>Approved Report</h3>
+		<h3>No invoice Report</h3>
 
 
-			<form class="form-inline">
-				
-					<div class="col-sm-6 input-daterange input-group">
-						  <label for="exampleInputName2">Select date :</label>
-						  <div class="form-group"  id="datepicker5">
-						    <!-- <label for="exampleInputName2">From :</label> -->
-						    <input type="text" class="input-sm form-control" name="from" placeholder="{{request.GET.from}}"/>
-						  </div>
-
-						  <div class="form-group"  id="datepicker">
-						    <!-- <label for="exampleInputEmail2">To</label> -->
-						    <input type="text" class="input-sm form-control" name="to" placeholder="{{request.GET.to}}"/>
-						  </div>
-					</div>
-
-						  <div class="checkbox">
-						    <select class="form-control" name="terminal">
-							  <option>ALL</option>
-							  <option>LCB1</option>
-							  <option>LCMT</option>
-							</select>
-						  </div>
-
-						  <div class="checkbox">
-						    <input type="checkbox" class="form-check-input" name="onlylifton">
-						    <label class="form-check-label" for="exampleCheck1">Show Only Lift-on</label>
-						  </div>
-						  <button type="submit" class="btn btn-primary">Show Report</button>
-						  <!-- <button type="submit" class="btn btn-primary">Clear</button> -->
-
-
-			</form>
-
+			
 
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
 		<table class="table table-bordered">
@@ -120,8 +88,7 @@
 					 			
 
 							 	{% if perms.crm.can_modify_invoice %}
-								 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
-								 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"Add" }}</a></td>
+								 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=accountaccept">{{ b.invoice|default_if_none:"Add" }}</a></td>
 							 	{% else %}
 							 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
 							 	{% endif %}
@@ -129,7 +96,7 @@
 							 	<td>
 							 		{% if b.account_accepted == False %}
 							 			{% if perms.crm.can_account_accept %}
-									 		<a href="{% url 'crm:booking-account-accept' b.slug %}?from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}&onlylifton={{request.GET.onlylifton}}">
+									 		<a href="{% url 'crm:booking-account-accept' b.slug %}">
 									 			Accept
 									 		</a>
 									 	{% endif %}
