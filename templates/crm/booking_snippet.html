@@ -229,4 +229,83 @@
 							<b>Remarks :</b> Approved free time 3 days
 							
 						</div>
+
+
+						<div class="no-print">
+							<h3>Administrative Log(s)</h3>
+
+							<div class="row">
+							<div class="col-xs-6 col-sm-6">
+								<table class="table table-hover">
+									<tr class="success">
+										<th colspan="2">CRM department</th>
+
+									</tr>
+									<tr >
+										<td>Draft :</td>
+										<td>
+											{% if object.draft %} 
+												Yes
+											{% else %}
+												No
+											{% endif %}
+											
+										</td>
+									</tr>
+									<tr >
+										<td>Created Date :</td>
+										<td>{{object.created_date }}</td>
+									</tr>
+
+									<tr >
+										<td>Approve :</td>
+										<td>
+											{% if object.approved %} 
+												Approved
+											{% else %}
+												Waiting for approve
+											{% endif %}
+											
+										</td>
+									</tr>
+									<tr >
+										<td>Approve Date :</td>
+										<td>{{object.approve_date|default_if_none:"" }}</td>
+									</tr>
+
+								</table>
+							</div>
+
+							<div class="col-xs-6 col-sm-6">
+								<table class="table table-hover">
+									<tr class="success">
+										<th colspan="2">Accounting department</th>
+									</tr>
+
+									<tr >
+										<td>Acceped :</td>
+										<td>
+											{% if object.account_accepted %} 
+												Yes
+											{% else %}
+												No
+											{% endif %}
+											
+										</td>
+									</tr>
+
+									<tr >
+										<td>Accept Date :</td>
+										<td>{{object.accepted_date|default_if_none:"" }}</td>
+									</tr>
+									
+									<tr>
+										<td>Comment :</td>
+										<td >{{object.account_comment|default_if_none:""}}</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+
+						</div>
 				
