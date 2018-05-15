@@ -27,17 +27,32 @@
 	<div class="row">
 		<h3>No invoice Report</h3>
 
+	
+
+		<form class="form-inline">
+						  <div class="checkbox">
+						    <select class="form-control" name="type">
+							  <option value="all">ALL</option>
+							  <option value="charge">Only Charge</option>
+							  <option value="notcharge">Only Not Charge</option>
+							</select>
+						  </div>
+
+						  <button type="submit" class="btn btn-primary">Show Report</button>
+		</form>
+
 
 			
 
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
-		<table class="table table-bordered">
+		<table class="table table-hover">
 					<tr>
 						<th>SSR#</th>
 						<th>SSR Date</th>
 				        <th>Line</th>
 				        <th>Customer</th>
 				        <th>BL#</th>
+				        <!-- <th>Total</th> -->
 				        <th>7 day</th>
 				        <th>8-14 day</th>
 				        <th>more 15 day</th>
@@ -49,6 +64,7 @@
 
 					
 						{% for b in object_list %}
+
 						<tr>
 
 							{% if perms.crm.can_modify_ssr %}
@@ -64,9 +80,9 @@
 						 	<td>{{ b.line }}</td>
 						 	<td><small>{{ b.customer }}</small></td>
 						 	<td nowrap>
-						 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+						 		<a href="{% url 'crm:booking-detail' b.slug  %}" target="_blank">{{ b.name }}</a>
 						   </td>
-					 		
+					 		<!-- <td><small>{{ b.charge_total }}</small></td> -->
 
 
 					 		{% for c in b.get_summary2 %}
@@ -141,7 +157,7 @@
 				{% if is_paginated %}
 				  <ul class="pagination">
 				    {% if page_obj.has_previous %}
-				      <li><a href="?page={{ page_obj.previous_page_number }} 	&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&laquo;</a></li>
+				      <li><a href="?page={{ page_obj.previous_page_number }}&type={{request.GET.type}}">&laquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&laquo;</span></li>
 				    {% endif %}
@@ -149,11 +165,11 @@
 				      {% if page_obj.number == i %}
 				        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
 				      {% else %}
-				        <li><a href="?page={{ i }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">{{ i }}</a></li>
+				        <li><a href="?page={{ i }}&type={{request.GET.type}}">{{ i }}</a></li>
 				      {% endif %}
 				    {% endfor %}
 				    {% if page_obj.has_next %}
-				      <li><a href="?page={{ page_obj.next_page_number }}&from={{request.GET.from}}&to={{request.GET.to}}&terminal={{request.GET.terminal}}">&raquo;</a></li>
+				      <li><a href="?page={{ page_obj.next_page_number }}&&type={{request.GET.type}}">&raquo;</a></li>
 				    {% else %}
 				      <li class="disabled"><span>&raquo;</span></li>
 				    {% endif %}

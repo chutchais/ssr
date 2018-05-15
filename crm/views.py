@@ -395,9 +395,17 @@ def f(**kwargs):
 	# print(kwargs)
 	return kwargs
 
+class BookingAcceptedListView(LoginRequiredMixin,ListView):
+	model = Booking
+	paginate_by = 25
+	template_name = 'crm/booking_accept.html'
+	def get_queryset(self):
+		return Booking.objects.filter(approved=True , 
+					account_accepted = True).order_by('-ssr_code')
+
 class BookingNotAcceptListView(LoginRequiredMixin,ListView):
 	model = Booking
-	paginate_by = 100
+	paginate_by = 25
 	template_name = 'crm/booking_notaccept.html'
 	def get_queryset(self):
 		return Booking.objects.filter(approved=True , 
@@ -405,11 +413,36 @@ class BookingNotAcceptListView(LoginRequiredMixin,ListView):
 
 class BookingNoInvoiceListView(LoginRequiredMixin,ListView):
 	model = Booking
-	paginate_by = 100
+	paginate_by = 25
 	template_name = 'crm/booking_noinvoice.html'
 	def get_queryset(self):
-		return Booking.objects.filter(approved=True , 
-					invoice = None).order_by('-ssr_code')
+		_type  = self.request.GET.get('type')
+		print('Type value %s' % _type )
+		kwargs = {}
+		if _type =='charge':
+			kwargs = {'charge__gt' : 0}
+
+		if _type =='notcharge':
+			kwargs = {'charge' : 0 }
+
+		if not _type  or _type == 'all':
+			return Booking.objects.filter(approved=True , 
+						invoice = None).order_by('-ssr_code')
+		else :
+			c = Container.objects.filter( **kwargs,
+					booking__approved=True,booking__invoice= None
+					)
+			if _type == None or _type == 'all':
+				bookig_list = [b.booking.name for b in c]
+			if _type =='charge':
+				bookig_list = [b.booking.name for b in c if b.booking.charge_total() > 0 or b.lifton > 0 or b.reloc > 0 ]
+			if _type =='notcharge':
+				bookig_list = [b.booking.name for b in c if b.booking.charge_total() == 0 and b.lifton == 0 and b.reloc == 0]
+			# bookig_list = c.values('booking__name').annotate(number=Sum('charge')).values_list('booking__name',flat=True)
+			return Booking.objects.filter(approved=True , 
+				invoice = None,
+				name__in=bookig_list).order_by('-ssr_code')
+
 
 class BookingApprovedListView(LoginRequiredMixin,ListView):
 	# print('approved')
@@ -762,6 +795,7 @@ class BookingUpdateView(LoginRequiredMixin,UpdateView):
 		context = super(BookingUpdateView,self).get_context_data(*args,**kwargs)
 		context['title']='Change SSR Code and Confirmation'
 		context['next']= self.request.GET.get('next')
+		context['tab_title'] = 'SSR of ' + self.kwargs.get('slug')
 		return context
 
 class BookingInvoiceUpdateView(LoginRequiredMixin,UpdateView):
@@ -801,4 +835,5 @@ class BookingInvoiceUpdateView(LoginRequiredMixin,UpdateView):
 		context = super(BookingInvoiceUpdateView,self).get_context_data(*args,**kwargs)
 		context['title']='Update Invoice information'
 		context['next']= self.request.GET.get('next')
+		context['tab_title'] = 'INV of ' + self.kwargs.get('slug')
 		return context

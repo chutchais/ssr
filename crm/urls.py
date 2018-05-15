@@ -24,7 +24,8 @@ from .views import (BookingFileListView,
 					BookingApprovedSummary,
 					ContainerListView,BookingAccountAccept,
 					BookingNoInvoiceListView,
-					BookingNotAcceptListView)
+					BookingNotAcceptListView,
+					BookingAcceptedListView)
 
 urlpatterns = [ 
 	url(r'^$',BookingListView.as_view(),name='home'),
@@ -62,6 +63,7 @@ urlpatterns = [
 	url(r'^report/wait$', BookingWaitingApproveListView.as_view(),name='report-waiting'),
 	url(r'^report/noinvoice$',BookingNoInvoiceListView.as_view(),name='report-noinvoice'),
 	url(r'^report/notaccept$',BookingNotAcceptListView.as_view(),name='report-notaccept'),
+	url(r'^report/accepted$',BookingAcceptedListView.as_view(),name='report-accepted'),
 	
 	
 ]

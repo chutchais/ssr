@@ -63,7 +63,7 @@
 
 
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
-		<table class="table table-bordered">
+		<table class="table table-hover">
 					<tr>
 						<th>SSR#</th>
 						<th>SSR Date</th>
@@ -96,7 +96,7 @@
 						 	<td>{{ b.line }}</td>
 						 	<td><small>{{ b.customer }}</small></td>
 						 	<td nowrap>
-						 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+						 		<a href="{% url 'crm:booking-detail' b.slug  %}" target="_blank">{{ b.name }}</a>
 						   </td>
 					 		
 

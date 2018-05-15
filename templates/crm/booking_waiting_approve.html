@@ -53,7 +53,7 @@
 		<!-- </div> -->
 
 		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
-		<table class="table table-bordered">
+		<table class="table table-hover">
 					<tr>
 						<th>Name</th>
 						<th>SSR#</th>
@@ -76,7 +76,7 @@
 						{% for b in object_list %}
 						<tr>
 					 	<td nowrap>
-					 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+					 		<a href="{% url 'crm:booking-detail' b.slug  %}" target="_blank">{{ b.name }}</a>
 					 	</td>
 					 	
 					 	{% if perms.crm.can_modify_ssr %}

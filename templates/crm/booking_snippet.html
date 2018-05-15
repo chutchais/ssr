@@ -2,7 +2,13 @@
 						
 						<div class="row">
 							<div>
-								<h2>{{ object.company}} </h2>
+								<br><br>
+								<!-- <h2>{{ object.company}} </h2> -->
+								{% if object.company.name == 'LCB1' %}
+									<img src="/static/images/lcb1.png">
+								{% else %}
+									<img src="/static/images/lcmt.png">
+								{% endif %}
 								<hr>
 							</div>
 							<div class="col-xs-6 col-sm-6">

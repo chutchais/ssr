@@ -34,11 +34,11 @@
 					</form>
 					
 				{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
-				<table class="table table-bordered">
+				<table class="table table-hover">
 					<tr>
 						<th>Name</th>
 						<th>SSR#</th>
-				        <th>Invoice#</th>
+				        <th>Cancel Inv#</th>
 				        <th></th>
 				        <th>Line</th>
 				        <!-- <th>Agent</th> -->
@@ -57,22 +57,23 @@
 						{% for b in object_list %}
 						<tr>
 					 	<td nowrap>
-					 		<a href="{% url 'crm:booking-detail' b.slug  %}">{{ b.name }}</a>
+					 		<a href="{% url 'crm:booking-detail' b.slug  %}" target="_blank">{{ b.name }}</a>
 					 	</td>
 					 	
 					 	{% if perms.crm.can_modify_ssr %}
 						 	<td nowrap><a href="{% url 'crm:booking-update' b.slug  %}?next=
-						 		{% url 'crm:booking-list' %}">{{ b.ssr_code }}</a></td>
+						 		{% url 'crm:booking-list' %}" target="_blank">{{ b.ssr_code }}</a></td>
 					 	{% else %}
 					 		<td nowrap>{{ b.ssr_code }}</td>
 					 	{% endif %}
 
-					 	{% if perms.crm.can_modify_invoice %}
+				<!-- 	 	{% if perms.crm.can_modify_invoice %}
 						 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
-						 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"" }}</a></td>
+						 		{% url 'crm:booking-list' %}">{{ b.cancel_invoice|default_if_none:"" }}</a></td>
 					 	{% else %}
-					 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
-					 	{% endif %}
+					 		<td nowrap>{{ b.cancel_invoice|default_if_none:"" }}</td>
+					 	{% endif %} -->
+					 	<td nowrap>{{ b.cancel_invoice|default_if_none:"" }}</td>
 
 					 	<td>{{ b.company }}</td>
 					 	<td>{{ b.line }}</td>
