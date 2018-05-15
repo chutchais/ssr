@@ -67,12 +67,18 @@
 					 		<td nowrap>{{ b.ssr_code }}</td>
 					 	{% endif %}
 
-					 	{% if perms.crm.can_modify_invoice %}
+				<!-- 	 	{% if perms.crm.can_modify_invoice %}
 						 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next=
 						 		{% url 'crm:booking-list' %}">{{ b.invoice|default_if_none:"" }}</a></td>
 					 	{% else %}
 					 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
-					 	{% endif %}
+					 	{% endif %} -->
+
+					 	{% if perms.crm.can_modify_invoice %}
+								 	<td nowrap><a href="{% url 'crm:booking-invoice' b.slug  %}?next={% url 'booking-search' %}?q={{request.GET.q}}">{{ b.invoice|default_if_none:"Add" }}</a></td>
+							 	{% else %}
+							 		<td nowrap>{{ b.invoice|default_if_none:"" }}</td>
+							 	{% endif %}
 
 					 	<td>{{ b.company }}</td>
 					 	<td>{{ b.line }}</td>
@@ -94,27 +100,25 @@
 					 	<td><span class="text-nowrap">{{ b.created_date|date:"d/m H:i" }}</span></td>
 
 					 	<td>
-					 		{% if b.draft %}
-					 			{% if perms.crm.can_send_approve %}
-							 		<a href="{% url 'crm:booking-send-approve' b.slug %}">
-							 			Send to Approve
-							 		</a>
-
-							 	{% endif %}
-							{% else %}
+						 		{% if b.draft %}
+						 			Draft
+						 		{% endif %}
+					 							
 								{% if b.draft == False and b.approved == False %}
-									Waiting Approve
+									Waiting CRM Approve
+								{% endif %}
+								
+
+								{% if b.draft == False and b.approved and b.account_accepted == False  %}
+									Waiting Acct Accept
 								{% endif %}
 
-								{% if b.draft == False and b.approved %}
-									Approved
+								{% if b.account_accepted %}
+									Acct Accepted
 								{% endif %}
+								
 
-								{% if b.approved and b.received %}
-									Acct Received
-								{% endif %}
-
-					 		{% endif %}
+					 		
 					 	</td>
 
 					 	{% empty %}
