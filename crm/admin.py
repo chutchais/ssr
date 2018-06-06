@@ -29,7 +29,7 @@ class ContainerAdmin(admin.ModelAdmin):
     list_filter = []
     list_display = ('__str__','booking')
     # list_editable = ('color','move_performa')
-    readonly_fields=('created_date','in_date','out_date','dwell',
+    readonly_fields=('created_date',
                     'charge','rate1','rate2','rate3','lifton','reloc')
     fieldsets = [
         ('Basic Information',{'fields': ['number','booking','created_date']}),
@@ -61,6 +61,7 @@ class BookingAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Basic Information',{'fields': ['name','ssr_code','company','invoice',
             'cancel_invoice','created_date','draft']}),
+        ('Booking File',{'fields': ['booking_file']}),
         ('Approval',{'fields': ['approved','approve_date']}),
         ('Receive',{'fields': ['received','receive_date']}),
         ]
