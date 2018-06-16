@@ -145,6 +145,9 @@ def BookingFileProcess(request,slug):
 			vIn =		xl_sheet.cell(row_index, 12).value.__str__().strip()
 			vOut =		xl_sheet.cell(row_index, 13).value.__str__().strip()
 			vDWell =	xl_sheet.cell(row_index, 14).value.__str__().strip()
+
+			# print ('Date in %s' % vIn)
+
 			# print (row_index,vVessel,vVoy,vLine,vAgent,vContainer)
 			# 1 -- create Vessel
 			vessel,created = Vessel.objects.get_or_create(name=vVessel)
@@ -178,7 +181,7 @@ def BookingFileProcess(request,slug):
 				container.container_size	= vLength
 				container.in_date			= datetime.strptime(vIn,'%d/%m/%Y') #String To Date
 				container.out_date			= datetime.strptime(vOut,'%d/%m/%Y') #String To Date
-				container.dwell				= vDWell
+				container.dwell				= int(float(vDWell))
 				container.save()
 
 
