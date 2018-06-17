@@ -503,6 +503,62 @@ class BookingApprovedListView(LoginRequiredMixin,ListView):
 # End Approval booking report
 
 
+class BookingDraftListView(LoginRequiredMixin,ListView):
+	# print('approved')
+	model = Booking
+	paginate_by = 100
+	template_name = 'crm/booking_approved.html'
+
+	def get_queryset(self):
+		_from 		= self.request.GET.get('from')
+		_to 		= self.request.GET.get('to')
+		_terminal 	= self.request.GET.get('terminal')
+		_line		= self.request.GET.get('line')
+		_onlylifton  = self.request.GET.get('onlylifton')
+		_onlylifton	= True if _onlylifton == 'on' else False
+
+		_terminal	= None if _terminal =='ALL' else _terminal
+
+		kwargs = {}
+		kwargs_con ={}
+		if _terminal:
+			kwargs ={
+					'company__name' : _terminal
+					}
+			kwargs_con ={
+					'booking__company__name' : _terminal
+					}
+
+		if _line:
+			kwargs = f(line__name=_line, **kwargs)
+			kwargs_con  = f(booking__line__name=_line, **kwargs_con)
+
+		if _from :
+			from datetime import datetime, timedelta
+			objStartDate = datetime.strptime(_from, '%Y-%m-%d')
+			objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
+			# print (kwargs)
+
+			if _onlylifton:
+				c = Container.objects.filter( **kwargs_con,
+					booking__approve_date__range=[objStartDate,objStopDate],
+					booking__approved=True,
+					lifton =1
+					)
+				bookig_list = c.values('booking__name').annotate(number=Sum('lifton')).values_list('booking__name',flat=True)
+				return Booking.objects.filter(**kwargs,
+						approve_date__range=[objStartDate,objStopDate],
+						approved=True, name__in=bookig_list).order_by('-ssr_code')
+			else:
+				return Booking.objects.filter(**kwargs,
+						approve_date__range=[objStartDate,objStopDate],
+						approved=True).order_by('-ssr_code')
+
+
+		return Booking.objects.none()
+# End Approval booking report
+
+
 # Container list report
 class ContainerListView(LoginRequiredMixin,ListView):
 	model = Container
@@ -568,7 +624,56 @@ class BookingListView(LoginRequiredMixin,ListView):
 				Q(customer__name__icontains=query)|
 				Q(invoice__icontains=query))&
 				Q(draft=True)).order_by('created_date')
-		return Booking.objects.filter(draft=True).order_by('created_date')
+		# return Booking.objects.filter(draft=True).order_by('created_date')
+
+		# _from 		= self.request.GET.get('from')
+		# _to 		= self.request.GET.get('to')
+		_terminal 	= self.request.GET.get('terminal')
+		_line		= self.request.GET.get('line')
+		# _onlylifton  = self.request.GET.get('onlylifton')
+		# _onlylifton	= True if _onlylifton == 'on' else False
+
+		_terminal	= None if _terminal =='ALL' else _terminal
+
+		kwargs = {}
+		kwargs_con ={}
+		if _terminal:
+			kwargs ={
+					'company__name' : _terminal
+					}
+			kwargs_con ={
+					'booking__company__name' : _terminal
+					}
+
+		if _line:
+			kwargs = f(line__name=_line, **kwargs)
+			kwargs_con  = f(booking__line__name=_line, **kwargs_con)
+
+
+		return Booking.objects.filter(**kwargs,
+						draft=True).order_by('created_date')
+
+
+# Booking Details
+# class BookingListView(LoginRequiredMixin,ListView):
+# 	# print('draft')
+# 	model = Booking
+# 	paginate_by = 100
+# 	template_name = 'crm/booking_draft.html'
+
+# 	def get_queryset(self):
+# 		query = self.request.GET.get('q')
+# 		if query :
+# 			return Booking.objects.filter((Q(name__icontains=query)|
+# 				Q(ssr_code__icontains=query)|
+# 				Q(voy__icontains=query)|
+# 				Q(line__name__icontains=query)|
+# 				Q(vessel__name__icontains=query)|
+# 				Q(company__name__icontains=query)|
+# 				Q(customer__name__icontains=query)|
+# 				Q(invoice__icontains=query))&
+# 				Q(draft=True)).order_by('created_date')
+# 		return Booking.objects.filter(draft=True).order_by('created_date')
 
 class BookingSearchView(LoginRequiredMixin,ListView):
 	model = Booking
@@ -840,3 +945,62 @@ class BookingInvoiceUpdateView(LoginRequiredMixin,UpdateView):
 		context['next']= self.request.GET.get('next')
 		context['tab_title'] = 'INV of ' + self.kwargs.get('slug')
 		return context
+
+# Approved Booking Report
+def BookingDraftSummary(request):
+	
+	# _from		= 	request.GET.get('from')
+	# _to 		= 	request.GET.get('to')
+	_terminal 	= 	request.GET.get('terminal','ALL')
+
+	# from datetime import datetime, timedelta
+
+	# if _from  and _to : 
+	# 	objStartDate = datetime.strptime(_from, '%Y-%m-%d')
+	# 	objStopDate = datetime.strptime(_to, '%Y-%m-%d') + timedelta(days=1)
+	# else:
+	# 	objStartDate = datetime.now()
+	# 	objStopDate  =  objStartDate + timedelta(days=1)
+
+
+	# stop_date_1 = objStopDate.strftime('%Y-%m-%d')
+	if _terminal == 'ALL':
+		qs  		= 	Booking.objects.filter(Q(draft=True))
+		c_qs 		= 	Container.objects.filter(booking__draft = True)
+	else:	
+		qs  		= 	Booking.objects.filter(Q(company__name = _terminal) &
+							Q(draft = True))
+		c_qs 		=   Container.objects.filter(booking__company__name = _terminal,
+						booking__draft = True
+						)
+	# Booking Summary
+	booking_by_line =	qs.values('company__name','line__name').annotate(
+							number=Count('name')
+							).order_by('company__name','line__name','-number')
+	container_by_line = c_qs.values('booking__company__name','booking__line__name').annotate(
+						number=Count('booking__name'))
+	# print(container_by_line)
+	# Container Summary
+	container_by_size = c_qs.values('booking__company__name','container_type','container_size').annotate(
+								number=Count('number'),
+								dwell_number=Sum('dwell'),
+								charge_number=Sum('charge'),
+								rate1_number = Sum('rate1'),
+								rate2_number = Sum('rate2'),
+								rate3_number = Sum('rate3'),
+								lifton_number = Sum('lifton'),
+								reloc_number = Sum('reloc')).order_by(
+								'booking__company__name','container_type','container_size')
+	# print (booking_by_line,container_by_size)
+
+	context ={
+			'booking_lists':booking_by_line,
+			'booking_container_list':container_by_line,
+			'container_lists': container_by_size,
+			# 'start_date' : objStartDate,
+			# 'stop_date':  objStopDate,
+			'terminal': _terminal
+	}
+	return render(request,
+			 'crm/draft_summary.html',
+			 context)

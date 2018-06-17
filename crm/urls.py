@@ -57,6 +57,7 @@ urlpatterns = [
 	url(r'^file/(?P<slug>[-\w]+)/$', BookingFileDetailView.as_view(), name='detail'),
 
 	# Report
+	url(r'^report/draft/summary$', views.BookingDraftSummary,name='report-draft-summary'),
 	url(r'^report/approved/container$', ContainerListView.as_view(),name='report-approved-container'),
 	url(r'^report/approved/summary$', views.BookingApprovedSummary,name='report-approved-summary'),
 	url(r'^report/approved/booking$', BookingApprovedListView.as_view(),name='report-approved'),

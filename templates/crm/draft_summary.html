@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load system_tag %}
+
+{% block head %}
+{% endblock head %}
+
+{% block title %}
+    Approved Summary
+{% endblock %}
+
+{% block style %}
+<style>
+    @media print {
+     /* styles go here */
+         @page {                
+            size: A4;
+            margin: 10mm;
+          }
+
+          html, body {
+            width: 1024px;
+          }
+
+          body {
+            margin: 0 auto;
+            line-height: 1em;
+            word-spacing:1px;
+            letter-spacing:0.2px;
+            font: 14px "Times New Roman", Times, serif;
+            background:white;
+            color:black;
+            width: 100%;
+            float: none;
+          }
+
+
+                  a[href]:after {
+            content: none !important;
+          }
+
+        .no-print, .no-print *
+            {
+                display: none !important;
+            }
+
+        {
+          table { page-break-after:auto }
+          tr    { page-break-inside:avoid; page-break-after:auto }
+          td    { page-break-inside:avoid; page-break-after:auto }
+          thead { display:table-header-group }
+          tfoot { display:table-footer-group }
+        }
+
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+
+    <h3>Draft Summary Report</h3>
+
+      <div class="col-sm-12 input-daterange input-group" id="datepicker">
+      <form class="form-inline">
+            
+            <div class="checkbox">
+              <select class="form-control" name="terminal">
+                <option>ALL</option>
+                <option>LCB1</option>
+                <option>LCMT</option>
+            </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Show Report</button>
+            <!-- <button type="submit" class="btn btn-primary">Clear</button> -->
+         
+      </form>
+    </div>
+  </div>
+  
+<div class="row">
+  <h3>{{terminal}} </h3>
+    <div class="col-xs-4 col-sm-4">
+        <table class="table table-hover">
+                  <tr class="success">
+                    <th>Terminal</th>
+                    <th>Line</th>
+                    <th>#Booking</th>
+                    <th>#Container</th>
+                  </tr>
+                  {% for object in booking_lists %}
+
+                  {% get_container_number booking_container_list object.company__name object.line__name as x %}
+                  <tr >
+                    <td>{{object.company__name}}</td>
+                    <td>{{object.line__name}}</td>
+                    <td class="align-right">
+                      <a href="{% url 'crm:booking-list'%}?terminal={{object.company__name}}&line={{object.line__name}}">
+                        {{object.number }}
+                      </a>
+                    </td>
+                    <td class="align-right">
+                      {{x}}
+                     <!--  <a href="{% url 'crm:booking-list' %}?terminal={{object.company__name}}&line={{object.line__name}}">
+                        
+                        </a> -->
+                    </td>
+                  </tr>
+                  {% endfor %}
+
+                  {% sum booking_lists 'number' as sum_booking %}
+                  {% sum booking_container_list 'number' as sum_container %}
+                  <tr>
+                    <td colspan="2"> <b>Total</b></td>
+                    <td><b>
+                        <a href="{% url 'crm:booking-list'%}?terminal={{ request.GET.terminal}}">
+                        {{sum_booking.number__sum}}
+                      </a>
+                    </b></td>
+                    <td><b>
+                      {{sum_container.number__sum}}
+                      <!-- <a href="{% url 'crm:report-approved-container' %}?">
+                        
+                        </a> -->
+                      </b></td>
+                  </tr>
+                
+        </table>
+    </div>
+    <div class="col-xs-8 col-sm-8">
+        <table class="table table-hover">
+                  <tr class="success">
+                    <th>Terminal</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>#Container</th>
+                    <th>dWell</th>
+                    <th>Charge</th>
+                    <th>Rate1</th>
+                    <th>Rate2</th>
+                    <th>Rate3</th>
+                    <th>Lift-On</th>
+                    <th>Re-Loc</th>
+                  </tr>
+                  {% for object in container_lists %}
+                  <tr >
+                    <td>{{object.booking__company__name}}</td>
+                    <td>{{object.container_type}}</td>
+                    <td>{{object.container_size}}</td>
+                    <td class="align-right">
+                      {{object.number}}
+                        
+                    </td>
+                    <td class="align-right">{{object.dwell_number }}</td>
+                    <td class="align-right">{{object.charge_number}}</td>
+                    <td class="align-right">{{object.rate1_number }}</td>
+                    <td class="align-right">{{object.rate2_number}}</td>
+                    <td class="align-right">{{object.rate3_number }}</td>
+                    <td class="align-right">{{object.lifton_number }}</td>
+                    <td class="align-right">{{object.reloc_number }}</td>
+                  </tr>
+                  {% endfor %}
+                
+        </table>
+
+    </div>
+
+  </div>
+    
+</div>
+{% endblock content %}
+
+{% block java_content %}
+<script>
+ 
+ $(function(){
+$('.input-daterange').datepicker({
+    autoclose: true,
+    format:'yyyy-m-d'
+});
+});
+
+  // $('select option[value="1"]').attr("selected",true);
+
+$(document).ready(function(){
+     // $('#year option[value="2018"]').prop('selected',true);
+     // $('year option[value="2018"]').attr("selected",true);
+     // console.log($('year').val());
+     $('#year').val({{year}});
+     $('#month').val({{month}});
+    // $("h3").click(function(){
+        
+    //     alert("The paragraph was clicked.");
+    // });
+
+    $('#startDate input').datepicker({
+      format:'YYYY-MM-DD',
+      todayBtn: true,
+      todayHighlight: true
+    });
+
+});
+</script>
+{% endblock java_content %}
