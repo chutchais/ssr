@@ -11,6 +11,7 @@ from django.conf import settings
 import xlrd
 import re
 
+
 from django.db.models import Q,F
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
@@ -52,6 +53,29 @@ from .models import (Agent,
 
 # 		context = self.get_context_data(form=form, object_list=self.object_list)
 # 		return self.render_to_response(context)
+
+import csv
+
+def export_booking_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="bookings.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['ssr', 'date', 'line', 'customer',
+    				'BL','7day','8-14day','more15day',
+    				'lifton','ReLoc','Invoice','Accept date'])
+
+    bookings = Booking.objects.filter(approved=True,account_accepted=True).order_by('-ssr_code')
+    for booking in bookings:
+        x=booking.get_summary2()[0]
+        # print(x)
+        
+        writer.writerow([booking.ssr_code,booking.created_date,booking.line,booking.customer,
+        				booking.name,x['rate1'],x['rate2'],x['rate3'],
+        				x['lifton'],x['reloc'],booking.invoice,booking.accepted_date])
+
+    return response
+
 
 def Home(request):
 	# now = datetime.datetime.now()
@@ -398,9 +422,12 @@ def f(**kwargs):
 	# print(kwargs)
 	return kwargs
 
+
+
+
 class BookingAcceptedListView(LoginRequiredMixin,ListView):
 	model = Booking
-	paginate_by = 25
+	paginate_by = 100
 	template_name = 'crm/booking_accept.html'
 	def get_queryset(self):
 		return Booking.objects.filter(approved=True , 

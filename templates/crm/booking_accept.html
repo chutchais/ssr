@@ -30,7 +30,7 @@
 
 			
 
-		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s).
+		{{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} record(s). <a href="{% url 'crm:report-export' %}"> Export data </a> 
 		<table class="table table-hover">
 					<tr>
 						<th>SSR#</th>

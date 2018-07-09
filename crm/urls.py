@@ -61,6 +61,7 @@ urlpatterns = [
 	url(r'^report/approved/container$', ContainerListView.as_view(),name='report-approved-container'),
 	url(r'^report/approved/summary$', views.BookingApprovedSummary,name='report-approved-summary'),
 	url(r'^report/approved/booking$', BookingApprovedListView.as_view(),name='report-approved'),
+	url(r'^report/approved/export$', views.export_booking_csv,name='report-export'),
 	url(r'^report/wait$', BookingWaitingApproveListView.as_view(),name='report-waiting'),
 	url(r'^report/noinvoice$',BookingNoInvoiceListView.as_view(),name='report-noinvoice'),
 	url(r'^report/notaccept$',BookingNotAcceptListView.as_view(),name='report-notaccept'),
