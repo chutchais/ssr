@@ -291,15 +291,37 @@ class Container(models.Model):
 			rate2=0
 			rate3=0
 			if self.booking.vip.no_back_charge <= 7:
-				if total_charge <=7:
-					rate1= total_charge
-				elif total_charge > 7 and total_charge <=14 :
-					rate1= 7
-					rate2= total_charge -7
-				else:
-					rate1= 7
-					rate2= 7
-					rate3 = total_charge -14
+			# 	if total_charge <=7:
+			# 		rate1= total_charge
+			# 	elif total_charge > 7 and total_charge <=14 :
+			# 		rate1= 7
+			# 		rate2= total_charge -7
+			# 	else:
+			# 		rate1= 7
+			# 		rate2= 7
+			# 		rate3 = total_charge -14
+			# else :
+				standard_max_day = 10
+				if self.dwell > standard_max_day:
+    					
+					rate1 = standard_max_day - 7 #self.booking.vip.no_back_charge
+					rate2 = self.dwell - standard_max_day
+					if rate2 > 7 :
+						rate2 = 7
+						rate3 = (self.dwell - standard_max_day)- rate2
+				else :
+					# print ('%s -- Less than 10' % self.number)
+					if total_charge <=7:
+						rate1= total_charge
+					elif total_charge > 7 and total_charge <=14 :
+						rate1= 7
+						rate2= total_charge -7
+					else:
+						rate1= 7
+						rate2= 7
+						rate3 = total_charge -14			
+
+
 
 			if self.booking.vip.no_back_charge > 7 and self.booking.vip.no_back_charge <= 14:
 				if total_charge <=7:
@@ -324,12 +346,13 @@ class Container(models.Model):
 		return 0
 
 	def update_charge(self):
-		self.charge = self.get_charge()[0]
-		self.rate1 = self.get_charge()[1]
-		self.rate2 = self.get_charge()[2]
-		self.rate3 = self.get_charge()[3]
-		self.lifton = self.get_charge()[4]
-		self.reloc = self.get_charge()[5]
+		cal = self.get_charge()
+		self.charge = cal[0]
+		self.rate1 = cal[1]
+		self.rate2 = cal[2]
+		self.rate3 = cal[3]
+		self.lifton = cal[4]
+		self.reloc = cal[5]
 
 
 		# if self.booking.vip:

@@ -68,7 +68,7 @@ class BookingAdmin(admin.ModelAdmin):
 admin.site.register(Booking,BookingAdmin)
 
 class VipAdmin(admin.ModelAdmin):
-    search_fields = ['line','consignee']
+    search_fields = ['line__name','consignee__name']
     list_filter = ['line','consignee','no_back_charge','storage','lifton','reloc']
     list_display = ('__str__','start_date','end_date','line','consignee','no_back_charge','storage','lifton','reloc')
     # list_editable = ('color','move_performa')
