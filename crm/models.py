@@ -302,9 +302,9 @@ class Container(models.Model):
 			# 		rate3 = total_charge -14
 			# else :
 				standard_max_day = 10
-				if self.dwell > standard_max_day:
+				if (self.dwell > standard_max_day) and self.booking.vip.no_back_charge !=3 :
     					
-					rate1 = standard_max_day - 7 #self.booking.vip.no_back_charge
+					rate1 = standard_max_day - self.booking.vip.no_back_charge
 					rate2 = self.dwell - standard_max_day
 					if rate2 > 7 :
 						rate2 = 7
