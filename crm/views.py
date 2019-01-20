@@ -69,10 +69,11 @@ def export_booking_csv(request):
     for booking in bookings:
         x=booking.get_summary2()[0]
         # print(x)
-        
-        writer.writerow([booking.ssr_code,booking.created_date,booking.line,booking.customer,
+        created_date_str = booking.created_date.strftime("%Y-%m-%d %H:%M:%S")
+        accepted_date_str = booking.accepted_date.strftime("%Y-%m-%d %H:%M:%S")
+        writer.writerow([booking.ssr_code,created_date_str,booking.line,booking.customer,
         				booking.name,x['rate1'],x['rate2'],x['rate3'],
-        				x['lifton'],x['reloc'],booking.invoice,booking.accepted_date])
+        				x['lifton'],x['reloc'],booking.invoice,accepted_date_str])
 
     return response
 
