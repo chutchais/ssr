@@ -268,20 +268,14 @@ class Container(models.Model):
 
 	def get_charge(self):
 		if self.booking.vip:
-			# if self.dwell > self.booking.vip.storage:
-			# 	return self.booking.vip.storage- self.booking.vip.no_back_charge
-			
-			# if (self.dwell <= self.booking.vip.storage) and (self.dwell> self.booking.vip.no_back_charge):
-			# 	return  self.dwell - self.booking.vip.no_back_charge
-
 			# Find total final charge (days)
 			if self.dwell > self.booking.vip.storage:
 				total_charge = self.booking.vip.storage - self.booking.vip.no_back_charge
 			else:
 				total_charge = self.dwell - self.booking.vip.no_back_charge
 
-			if total_charge<0:
-				total_charge=0
+			if total_charge  < 0:
+				total_charge = 0
 
 			# if total_charge > self.booking.vip.storage :
 			# 	total_charge = self.booking.vip.storage - self.dwell
@@ -290,48 +284,52 @@ class Container(models.Model):
 			rate1=0
 			rate2=0
 			rate3=0
-			if self.booking.vip.no_back_charge <= 7:
-			# 	if total_charge <=7:
-			# 		rate1= total_charge
-			# 	elif total_charge > 7 and total_charge <=14 :
-			# 		rate1= 7
-			# 		rate2= total_charge -7
-			# 	else:
-			# 		rate1= 7
-			# 		rate2= 7
-			# 		rate3 = total_charge -14
-			# else :
-				standard_max_day = 10
-				if (self.dwell > standard_max_day) and self.booking.vip.no_back_charge !=3 :
+			# if self.booking.vip.no_back_charge <= 7:
+			# 	standard_max_day = 10
+			# 	if (self.dwell > standard_max_day) and self.booking.vip.no_back_charge !=3 :
     					
-					rate1 = standard_max_day - self.booking.vip.no_back_charge
-					rate2 = self.dwell - standard_max_day
-					if rate2 > 7 :
-						rate2 = 7
-						rate3 = (self.dwell - standard_max_day)- rate2
+			# 		rate1 = standard_max_day - self.booking.vip.no_back_charge
+			# 		rate2 = self.dwell - standard_max_day
+			# 		if rate2 > 7 :
+			# 			rate2 = 7
+			# 			rate3 = (self.dwell - standard_max_day)- rate2
+			# 	else :
+			# 		# print ('%s -- Less than 10' % self.number)
+			# 		if total_charge <=7:
+			# 			rate1= total_charge
+			# 		elif total_charge > 7 and total_charge <=14 :
+			# 			rate1= 7
+			# 			rate2= total_charge -7
+			# 		else:
+			# 			rate1= 7
+			# 			rate2= 7
+			# 			rate3 = total_charge -14
+
+			# if self.booking.vip.no_back_charge > 7 and self.booking.vip.no_back_charge <= 14:
+			# 	if total_charge <=7:
+			# 		rate2= total_charge
+			# 	else :
+			# 		rate2= 7
+			# 		rate3= total_charge -7
+
+			# if self.booking.vip.no_back_charge > 14 :
+			# 		rate3 = total_charge
+
+
+			# New Revised on Jun 10,2019
+			# First Rate (PAT free = 3 days)
+			# print(total_charge)
+			if total_charge > 0 :
+				if self.dwell > self.booking.vip.storage:
+					rate1 = 7 - (self.booking.vip.no_back_charge - 3)
+					rate2 = 0 if rate1 <= 0 else total_charge - rate1
+					rate3 = 0 if rate2 <= 0 else total_charge - rate1 - rate2
 				else :
-					# print ('%s -- Less than 10' % self.number)
-					if total_charge <=7:
-						rate1= total_charge
-					elif total_charge > 7 and total_charge <=14 :
-						rate1= 7
-						rate2= total_charge -7
-					else:
-						rate1= 7
-						rate2= 7
-						rate3 = total_charge -14			
+					# rate1 = total_charge
+					rate1 = 7 - total_charge
+					rate2 = 0 if rate1 <= 0 else total_charge - rate1
+					rate3 = 0 if rate2 <= 0 else total_charge - rate1 - rate2
 
-
-
-			if self.booking.vip.no_back_charge > 7 and self.booking.vip.no_back_charge <= 14:
-				if total_charge <=7:
-					rate2= total_charge
-				else :
-					rate2= 7
-					rate3= total_charge -7
-
-			if self.booking.vip.no_back_charge > 14 :
-					rate3 = total_charge
 
 			lifton=0
 			if self.booking.vip.lifton:
