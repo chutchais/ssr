@@ -742,8 +742,9 @@ def BookingVip(request,slug):
 	# Get ETB from Auto berth System
 	vessel_code =  booking.vessel.code
 	voy 		=  booking.voy
-	print('Get ETB from autoberth : %s - %s' % (vessel_code,voy))
+	print('Get ETB from autoberth2 : %s - %s' % (vessel_code,voy))
 	etb = getETB(vessel_code,voy)
+	# etb =''
 	if etb != '':
 		booking.etb = etb
 		booking.save()

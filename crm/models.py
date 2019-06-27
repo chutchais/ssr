@@ -186,6 +186,7 @@ class Booking(models.Model):
 		voy 		=  first_container.booking.voy
 		print('Get ETB from autoberth(on update charge) : %s : %s - %s' % (self.name,vessel_code,voy))
 		etb = getETB(vessel_code,voy)
+		# etb =''
 		if etb != '':
 			self.etb 	= etb
 			self.save()
@@ -321,13 +322,20 @@ class Container(models.Model):
 			# print(total_charge)
 			if total_charge > 0 :
 				if self.dwell > self.booking.vip.storage:
-					rate1 = 7 - (self.booking.vip.no_back_charge - 3)
-					rate2 = 0 if rate1 <= 0 else total_charge - rate1
+					x = 7 - (self.booking.vip.no_back_charge - 3)
+					print (x)
+					rate1 = total_charge if total_charge <= x else x
+					rate2 = 0 if rate1 <= 0 else total_charge - rate1 if (total_charge - rate1)<=7 else 7
 					rate3 = 0 if rate2 <= 0 else total_charge - rate1 - rate2
+					# rate1 = x if total_charge <= 3 else 7-self.booking.vip.no_back_charge
+					# rate2 = 0 if rate1 <= 0 else total_charge - rate1 if (total_charge - rate1)<=7 else 7
+					# rate3 = 0 if rate2 <= 0 else total_charge - rate1 - rate2
 				else :
-					# rate1 = total_charge
-					rate1 = 7 - total_charge
-					rate2 = 0 if rate1 <= 0 else total_charge - rate1
+					# rate1 = total_charge = self.dwell - self.booking.vip.no_back_charge
+					# 1 Day (Comp Free) , 3 days free (POT) = 4 days
+					x = 7 - (self.booking.vip.no_back_charge - 3)
+					rate1 = total_charge if total_charge <= x else x
+					rate2 = 0 if rate1 <= 0 else total_charge - rate1 if (total_charge - rate1)<=7 else 7
 					rate3 = 0 if rate2 <= 0 else total_charge - rate1 - rate2
 
 
